@@ -8,6 +8,7 @@
     "start": "parcel -p 3300 public/index.html"
   },
   "dependencies": {
+    "@material-ui/core": "^3.9.2",
     "react": "^16.8.4",
     "react-dom": "^16.8.4"
   },

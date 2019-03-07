@@ -1,7 +1,13 @@
 import React from 'react';
-import { render } from 'react-dom';
+import ReactDOM from "react-dom";
+import Button from '@material-ui/core/Button';
 
-render(
-  React.createElement("div", null, "Hello World"),
-  document.getElementById("root")
+function App() {
+  return (
+    <Button variant="contained" color="primary">
+    Hello World
+  </Button>
 );
+}
+
+ReactDOM.render(<App />, document.querySelector('#root'));
