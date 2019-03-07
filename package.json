@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "backend:start": "cd backend && node index.js",
-    "backend:setup": "cd backend && npm install"
+    "backend:setup": "cd backend && npm install",
+    "start": "parcel -p 3300 public/index.html"
   },
   "dependencies": {
     "react": "^16.8.4",
