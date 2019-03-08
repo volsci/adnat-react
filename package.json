@@ -5,19 +5,37 @@
   "scripts": {
     "backend:start": "cd backend && node index.js",
     "backend:setup": "cd backend && npm install",
-    "start": "parcel -p 3300 public/index.html"
+    "start": "parcel -p 3300 public/index.html",
+    "pretest": "eslint src/**",
+    "test": "jest",
+    "cypress": "cypress open"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup/setupTests.js"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/tests/setup/",
+      "<rootDir>/cypress"
+    ]
   },
   "dependencies": {
     "@material-ui/core": "^3.9.2",
+    "eslint": "^5.15.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4"
   },
   "devDependencies": {
-    "eslint": "^5.15.1",
+    "babel-eslint": "^10.0.1",
+    "cypress": "^3.1.5",
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16": "^1.10.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-react": "^7.12.4",
+    "jest": "^24.3.1",
     "parcel-bundler": "^1.12.0"
   }
 }
