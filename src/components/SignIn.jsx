@@ -1,5 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { instanceOf } from "prop-types";
+import { withCookies, Cookies } from 'react-cookie';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -69,20 +70,38 @@ class SignIn extends React.Component {
     });
   };
 
-  handleSnackBarOpen(errorMsg) {
+  handleChange = name => (event) => {
+    this.setState({ [name]: event.target.checked });
+  };
+
+
+  handleSnackBarOpen = (errorMsg) => {
     this.setState({
       error: true,
       errorMsg,
     });
-  }
+  };
 
-  handleSnackBarClose = (event) => {
+  handleSnackBarClose = () => {
     this.setState({
       error: false,
       errorMsg: '',
     });
   };
 
+  saveCookie = (sessionId) => {
+    const { cookies } = this.props;
+
+    if (this.state.rememberMe) {
+      const rememberMeExpiry = new Date();
+      rememberMeExpiry.setDate(rememberMeExpiry.getDate() + 7);
+      cookies.set('sessionId', sessionId, { expires: rememberMeExpiry, path: '/' });
+    } else {
+      cookies.set('sessionId', sessionId, { path: '/' });
+    }
+
+    console.log(cookies.getAll());
+  };
 
   handleLogin = (event) => {
     event.preventDefault();
@@ -106,7 +125,7 @@ class SignIn extends React.Component {
         }).then(res => res.json())
           .then(response => {
             if (response.error === undefined){
-              console.log(JSON.stringify(response));
+              this.saveCookie(response.sessionId);
             } else {
               this.handleSnackBarOpen(response.error);
             }
@@ -137,10 +156,6 @@ class SignIn extends React.Component {
         .then(response => console.log('Success:', JSON.stringify(response)))
         .catch(error => console.error('Error:', error));
     })();
-  };
-
-  handleChange = name => (event) => {
-    this.setState({ [name]: event.target.checked });
   };
 
   render() {
@@ -256,6 +271,8 @@ class SignIn extends React.Component {
 
 SignIn.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  cookies: instanceOf(Cookies).isRequired
 };
 
-export default withStyles(styles)(SignIn);
+SignIn = withStyles(styles)(SignIn);
+export default withCookies(SignIn);
