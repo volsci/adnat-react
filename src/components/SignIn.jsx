@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -46,7 +47,18 @@ const styles = theme => ({
 
 class SignIn extends React.Component {
   state = {
-    rememberMe: true,
+    email: '',
+    password: '',
+    rememberMe: false,
+  };
+
+  handleLogin = (event) => {
+    event.preventDefault();
+
+    axios.post('http://localhost:3000/auth/login', { email, password })
+      .then((res) => {
+        console.log(res);
+      });
   };
 
   handleChange = name => (event) => {
@@ -116,7 +128,7 @@ class SignIn extends React.Component {
                   </Grid>
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.login}>
+                  <Button variant="contained" color="secondary" className={classes.login} onClick={this.handleLogin}>
                     Log In
                   </Button>
 
