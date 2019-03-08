@@ -23,6 +23,7 @@
   "dependencies": {
     "@material-ui/core": "^3.9.2",
     "eslint": "^5.15.1",
+    "prop-types": "^15.7.2",
     "react": "^16.8.4",
     "react-dom": "^16.8.4"
   },
