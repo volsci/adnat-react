@@ -55,10 +55,18 @@ class SignIn extends React.Component {
   handleLogin = (event) => {
     event.preventDefault();
 
-    axios.post('http://localhost:3000/auth/login', { email, password })
-      .then((res) => {
-        console.log(res);
-      });
+    axios.post('http://localhost:3000/auth/login', {
+      params: {
+        email: this.state.email,
+        password: this.state.password,
+      }
+    })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
   };
 
   handleChange = name => (event) => {
