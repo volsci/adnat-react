@@ -5,7 +5,7 @@ const DB = require("../db");
 const { comparePassword, hashPassword } = require("../util/password");
 const { sessionMiddleware } = require("../util/session");
 
-router.post("/signup", (req, res) => {
+router.post("/signUp", (req, res) => {
   const {
     name,
     email,
