@@ -9,6 +9,9 @@ import Grid from '@material-ui/core/Grid/Grid';
 import Switch from '@material-ui/core/Switch/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import FormGroup from '@material-ui/core/FormGroup/FormGroup';
+import CloseIcon from '@material-ui/icons/Close';
+import Snackbar from '@material-ui/core/Snackbar/Snackbar';
+import IconButton from '@material-ui/core/IconButton/IconButton';
 
 
 const styles = theme => ({
@@ -49,43 +52,78 @@ class SignIn extends React.Component {
     email: '',
     password: '',
     rememberMe: false,
+    error: false,
+    errorMsg: '',
   };
+
+  handleEmailInput = (event) => {
+    this.setState({
+      email: event.target.value,
+    });
+  };
+
+  handlePasswordInput = (event) => {
+    this.setState({
+      password: event.target.value,
+    });
+  };
+
+  handleSnackBarOpen(errorMsg) {
+    this.setState({
+      error: true,
+      errorMsg,
+    });
+
+    console.log(this.state.errorMsg);
+  }
+
+  handleSnackBarClose = (event) => {
+    this.setState({
+      error: false,
+      errorMsg: '',
+    });
+  };
+
 
   handleLogin = (event) => {
     event.preventDefault();
 
-    (async () => {
-      await fetch("http://localhost:3000/auth/login", {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        method: 'POST',
-        body: JSON.stringify({
-          email: "foo",
-          password: "foo",
-        }),
-      }).then(res => res.json())
-        .then(response => console.log('Success:', JSON.stringify(response)))
-        .catch(error => console.error('Error:', error));
-    })();
+    if (this.state.email.includes('@')) {
+      (async () => {
+        await fetch('http://localhost:3000/auth/login', {
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+          body: JSON.stringify({
+            email: this.state.email,
+            password: this.state.password,
+          }),
+        }).then(res => res.json())
+          .then(response => console.log('Success:', JSON.stringify(response)))
+          .catch(error => console.error('Error:', error));
+      })();
+    } else {
+      this.handleSnackBarOpen("Please include an '@' in the email address.");
+    }
   };
 
   handleSignUp = (event) => {
     event.preventDefault();
 
     (async () => {
-      await fetch("http://localhost:3000/auth/signUp", {
+      await fetch('http://localhost:3000/auth/signUp', {
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
         method: 'POST',
         body: JSON.stringify({
-          name: "foo",
-          email: "foo",
-          password: "foo",
-          passwordConfirmation: "foo",
+          name: 'foo',
+          email: 'foo',
+          password: 'foo',
+          passwordConfirmation: 'foo',
         }),
       }).then(res => res.json())
         .then(response => console.log('Success:', JSON.stringify(response)))
@@ -122,6 +160,8 @@ class SignIn extends React.Component {
                     autoComplete="email"
                     margin="normal"
                     variant="outlined"
+                    value={this.state.email}
+                    onChange={this.handleEmailInput}
                   />
                 </CardActions>
                 <CardActions>
@@ -133,6 +173,8 @@ class SignIn extends React.Component {
                     autoComplete="current-password"
                     margin="normal"
                     variant="outlined"
+                    value={this.state.password}
+                    onChange={this.handlePasswordInput}
                   />
                 </CardActions>
                 <CardActions>
@@ -172,6 +214,33 @@ class SignIn extends React.Component {
             </Grid>
           </Grid>
         </Grid>
+
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={this.state.error}
+          autoHideDuration={3000}
+          onClose={this.handleSnackBarClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">{this.state.errorMsg}</span>}
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              className={classes.close}
+              onClick={this.handleClose}
+            >
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
+
+
       </Grid>
     );
   }
