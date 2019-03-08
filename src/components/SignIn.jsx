@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -55,18 +54,43 @@ class SignIn extends React.Component {
   handleLogin = (event) => {
     event.preventDefault();
 
-    axios.post('http://localhost:3000/auth/login', {
-      params: {
-        email: this.state.email,
-        password: this.state.password,
-      }
-    })
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
+    (async () => {
+      await fetch("http://localhost:3000/auth/login", {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          email: "foo",
+          password: "foo",
+        }),
+      }).then(res => res.json())
+        .then(response => console.log('Success:', JSON.stringify(response)))
+        .catch(error => console.error('Error:', error));
+    })();
+  };
+
+  handleSignUp = (event) => {
+    event.preventDefault();
+
+    (async () => {
+      await fetch("http://localhost:3000/auth/signUp", {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          name: "foo",
+          email: "foo",
+          password: "foo",
+          passwordConfirmation: "foo",
+        }),
+      }).then(res => res.json())
+        .then(response => console.log('Success:', JSON.stringify(response)))
+        .catch(error => console.error('Error:', error));
+    })();
   };
 
   handleChange = name => (event) => {
@@ -142,7 +166,7 @@ class SignIn extends React.Component {
 
                 </CardActions>
               </Card>
-              <Button color="primary" className={classes.signUp}>
+              <Button color="primary" className={classes.signUp} onClick={this.handleSignUp}>
                 Don't have an account yet? Sign Up
               </Button>
             </Grid>
