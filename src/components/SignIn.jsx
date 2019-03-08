@@ -30,6 +30,7 @@ const styles = theme => ({
     height: 700,
   },
   input: {
+    margin: theme.spacing.unit,
     width: '100%',
   },
   login: {
@@ -41,7 +42,7 @@ const styles = theme => ({
     width: '100%',
   },
   accountHandlers: {
-    margin: theme.spacing.unit * 3,
+    margin: theme.spacing.unit,
     marginLeft: 'auto',
     width: '100%',
   },
@@ -73,8 +74,6 @@ class SignIn extends React.Component {
       error: true,
       errorMsg,
     });
-
-    console.log(this.state.errorMsg);
   }
 
   handleSnackBarClose = (event) => {
@@ -88,7 +87,11 @@ class SignIn extends React.Component {
   handleLogin = (event) => {
     event.preventDefault();
 
-    if (this.state.email.includes('@')) {
+    if (this.state.email === '' || this.state.password === '') {
+      this.handleSnackBarOpen("Please enter your email address and password");
+    } else if (!this.state.email.includes('@')) {
+      this.handleSnackBarOpen("Please include an '@' in the email address");
+    } else {
       (async () => {
         await fetch('http://localhost:3000/auth/login', {
           headers: {
@@ -101,11 +104,16 @@ class SignIn extends React.Component {
             password: this.state.password,
           }),
         }).then(res => res.json())
-          .then(response => console.log('Success:', JSON.stringify(response)))
+          .then(response => {
+            if (response.error === undefined){
+              console.log(JSON.stringify(response));
+            } else {
+              this.handleSnackBarOpen(response.error);
+            }
+
+          })
           .catch(error => console.error('Error:', error));
       })();
-    } else {
-      this.handleSnackBarOpen("Please include an '@' in the email address.");
     }
   };
 
@@ -121,7 +129,7 @@ class SignIn extends React.Component {
         method: 'POST',
         body: JSON.stringify({
           name: 'foo',
-          email: 'foo',
+          email: 'foo@bar.com',
           password: 'foo',
           passwordConfirmation: 'foo',
         }),
