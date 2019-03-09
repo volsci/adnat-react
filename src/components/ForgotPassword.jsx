@@ -43,6 +43,10 @@ const styles = theme => ({
   },
 });
 
+/**
+ * The ForgotPassword component allows the user to enter their email. Future
+ * functionality will see an email sent to the user with a reset password link.
+ */
 class ForgotPassword extends React.Component {
   state = {
     email: '',
@@ -71,6 +75,12 @@ class ForgotPassword extends React.Component {
     });
   };
 
+  /**
+   * The input is validated and discarded if it does not pass some basic checks.
+   * Valid input would result in an email being sent to the specified address,
+   * however this functionality is currently unavailable and there is just a pop
+   * up to acknowledge successful input.
+   */
   handleEmailPassword = (event) => {
     event.preventDefault();
 
@@ -97,6 +107,10 @@ class ForgotPassword extends React.Component {
   render() {
     const { classes } = this.props;
 
+    /**
+     * Using react-router, if the correct state is detected the redirect component
+     * will return the user to the log in page.
+     */
     if (this.state.toLogIn === true) {
       return <Redirect to="/" />;
     }
@@ -165,8 +179,6 @@ class ForgotPassword extends React.Component {
             </IconButton>,
           ]}
         />
-
-
       </Grid>
     );
   }

@@ -15,7 +15,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import IconButton from '@material-ui/core/IconButton/IconButton';
 
-
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -50,6 +49,12 @@ const styles = theme => ({
   },
 });
 
+/**
+ * The LogIn component is the entry point into the application. The user can
+ * attempt to input their email and password but if these fail a check against
+ * the db, an error is thrown. An authenticated user is redirected to their
+ * dashboard and the application proper.
+ */
 class LogIn extends React.Component {
   state = {
     email: '',
@@ -99,9 +104,18 @@ class LogIn extends React.Component {
     });
   };
 
+  /**
+   * When a user is successfully authenticated, they receive a session ID. This
+   * session ID is saved as a cookie, using react-cookie.
+   */
   saveCookie = (sessionId) => {
     const { cookies } = this.props;
 
+    /**
+     * If the user has checked remember me, the cookie containing their session ID
+     * is given longer until it expires, in this case exactly a week, which is
+     * a suitable length of time for the context of the application.
+     */
     if (this.state.rememberMe === true) {
       const rememberMeExpiry = new Date();
       rememberMeExpiry.setDate(rememberMeExpiry.getDate() + 7);
@@ -109,10 +123,15 @@ class LogIn extends React.Component {
     } else {
       cookies.set('sessionId', sessionId, { path: '/' });
     }
-
-    console.log(cookies.getAll());
   };
 
+  /**
+   * The input is validated and discarded if it does not pass some basic checks.
+   * Valid input is composed into a POST request sent to the db, which will respond
+   * with a session ID. If the user enters an incorrect email or password, the db
+   * will respond with an error, the text of which will be shown to the user in
+   * a pop up.
+   */
   handleLogin = (event) => {
     event.preventDefault();
 
@@ -156,10 +175,18 @@ class LogIn extends React.Component {
   render() {
     const { classes } = this.props;
 
+    /**
+     * Using react-router, if the correct state is detected the redirect component
+     * will return the user to the sign up page.
+     */
     if (this.state.toSignUp === true) {
       return <Redirect to="/signup" />;
     }
 
+    /**
+     * Using react-router, if the correct state is detected the redirect component
+     * will return the user to the forgot password page.
+     */
     if (this.state.toForgotPassword === true) {
       return <Redirect to="/forgotpass" />;
     }
@@ -265,8 +292,6 @@ class LogIn extends React.Component {
             </IconButton>,
           ]}
         />
-
-
       </Grid>
     );
   }

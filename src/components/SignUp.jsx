@@ -42,6 +42,11 @@ const styles = theme => ({
   },
 });
 
+/**
+ * The SignUp component allows the user to create a new account, which is written
+ * to the database after validation. After they create an account, they are
+ * redirected back to the login page.
+ */
 class SignUp extends React.Component {
   state = {
     name: '',
@@ -91,6 +96,11 @@ class SignUp extends React.Component {
     });
   };
 
+  /**
+   * The input is validated and discarded if it does not pass some basic checks.
+   * Valid input is composed into a POST request sent to the db, which will
+   * create a new user entry.
+   */
   handleSignUp = (event) => {
     event.preventDefault();
 
@@ -143,6 +153,10 @@ class SignUp extends React.Component {
   render() {
     const { classes } = this.props;
 
+    /**
+     * Using react-router, if the correct state is detected the redirect component
+     * will return the user to the log in page.
+     */
     if (this.state.toLogIn === true) {
       return <Redirect to="/" />;
     }
@@ -246,8 +260,6 @@ class SignUp extends React.Component {
             </IconButton>,
           ]}
         />
-
-
       </Grid>
     );
   }
