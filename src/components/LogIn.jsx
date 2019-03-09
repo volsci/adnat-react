@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes, { instanceOf } from "prop-types";
 import { withCookies, Cookies } from 'react-cookie';
 import { withStyles } from '@material-ui/core/styles';
+import { Redirect } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
@@ -56,6 +57,8 @@ class LogIn extends React.Component {
     rememberMe: false,
     error: false,
     errorMsg: '',
+    toSignUp: false,
+    toForgotPassword: false
   };
 
   handleEmailInput = (event) => {
@@ -74,6 +77,13 @@ class LogIn extends React.Component {
     this.setState({ [name]: event.target.checked });
   };
 
+  handleForgotPassword = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      toForgotPassword: true
+    });
+  };
 
   handleSnackBarOpen = (errorMsg) => {
     this.setState({
@@ -92,7 +102,7 @@ class LogIn extends React.Component {
   saveCookie = (sessionId) => {
     const { cookies } = this.props;
 
-    if (this.state.rememberMe) {
+    if (this.state.rememberMe === true) {
       const rememberMeExpiry = new Date();
       rememberMeExpiry.setDate(rememberMeExpiry.getDate() + 7);
       cookies.set('sessionId', sessionId, { expires: rememberMeExpiry, path: '/' });
@@ -139,27 +149,21 @@ class LogIn extends React.Component {
   handleSignUp = (event) => {
     event.preventDefault();
 
-    (async () => {
-      await fetch('http://localhost:3000/auth/signUp', {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify({
-          name: 'foo',
-          email: 'foo@bar.com',
-          password: 'foo',
-          passwordConfirmation: 'foo',
-        }),
-      }).then(res => res.json())
-        .then(response => console.log('Success:', JSON.stringify(response)))
-        .catch(error => console.error('Error:', error));
-    })();
+    this.setState({
+      toSignUp: true
+    });
   };
 
   render() {
     const { classes } = this.props;
+
+    if (this.state.toSignUp === true){
+      return <Redirect to='/signup' />
+    }
+
+    if (this.state.toForgotPassword === true){
+      return <Redirect to='/forgotpass' />
+    }
 
     return (
       <Grid container className={classes.root}>
@@ -218,7 +222,7 @@ class LogIn extends React.Component {
                       </FormGroup>
                     </Grid>
                     <Grid item xs={6}>
-                      <Button color="primary" className={classes.accountHandlers}>
+                      <Button color="primary" className={classes.accountHandlers} onClick={this.handleForgotPassword}>
                         Forgot Password
                       </Button>
                     </Grid>
