@@ -200,7 +200,7 @@ class SignUp extends React.Component {
                 <CardActions>
                   <TextField
                     className={classes.input}
-                    id="outlined-passwordConfirmation-input"
+                    id="outlined-password-input"
                     label="Password"
                     type="password"
                     margin="normal"
@@ -212,7 +212,7 @@ class SignUp extends React.Component {
                 <CardActions>
                   <TextField
                     className={classes.input}
-                    id="outlined-password-input"
+                    id="outlined-passwordConfirmation-input"
                     label="Confirm Password"
                     type="password"
                     margin="normal"
