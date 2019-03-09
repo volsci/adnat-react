@@ -1,18 +1,14 @@
 import React from 'react';
-import PropTypes, { instanceOf } from "prop-types";
-import { withCookies, Cookies } from 'react-cookie';
-import { withStyles } from '@material-ui/core/styles';
+import PropTypes from "prop-types";
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField/TextField';
 import Grid from '@material-ui/core/Grid/Grid';
-import Switch from '@material-ui/core/Switch/Switch';
-import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
-import FormGroup from '@material-ui/core/FormGroup/FormGroup';
 import CloseIcon from '@material-ui/icons/Close';
 import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import IconButton from '@material-ui/core/IconButton/IconButton';
+import withStyles from "@material-ui/core/es/styles/withStyles";
 
 
 const styles = theme => ({
@@ -34,13 +30,10 @@ const styles = theme => ({
     margin: theme.spacing.unit,
     width: '100%',
   },
-  login: {
+  signup: {
     margin: theme.spacing.unit,
     width: '100%',
     marginLeft: 'auto',
-  },
-  signUp: {
-    width: '100%',
   },
   accountHandlers: {
     margin: theme.spacing.unit,
@@ -49,13 +42,20 @@ const styles = theme => ({
   },
 });
 
-class SignIn extends React.Component {
+class SignUp extends React.Component {
   state = {
+    name: '',
     email: '',
     password: '',
-    rememberMe: false,
+    passwordConfirmation: '',
     error: false,
     errorMsg: '',
+  };
+
+  handleNameInput = (event) => {
+    this.setState({
+      name: event.target.value,
+    });
   };
 
   handleEmailInput = (event) => {
@@ -70,10 +70,11 @@ class SignIn extends React.Component {
     });
   };
 
-  handleChange = name => (event) => {
-    this.setState({ [name]: event.target.checked });
+  handlePasswordConfirmationInput = (event) => {
+    this.setState({
+      passwordConfirmation: event.target.value,
+    });
   };
-
 
   handleSnackBarOpen = (errorMsg) => {
     this.setState({
@@ -89,43 +90,34 @@ class SignIn extends React.Component {
     });
   };
 
-  saveCookie = (sessionId) => {
-    const { cookies } = this.props;
-
-    if (this.state.rememberMe) {
-      const rememberMeExpiry = new Date();
-      rememberMeExpiry.setDate(rememberMeExpiry.getDate() + 7);
-      cookies.set('sessionId', sessionId, { expires: rememberMeExpiry, path: '/' });
-    } else {
-      cookies.set('sessionId', sessionId, { path: '/' });
-    }
-
-    console.log(cookies.getAll());
-  };
-
   handleLogin = (event) => {
     event.preventDefault();
 
-    if (this.state.email === '' || this.state.password === '') {
-      this.handleSnackBarOpen("Please enter your email address and password");
+    if (this.state.name === '' ||
+      this.state.email === '' ||
+      this.state.password === '' ||
+      this.state.passwordConfirmation === '') {
+      this.handleSnackBarOpen("Please provide all of your details");
     } else if (!this.state.email.includes('@')) {
       this.handleSnackBarOpen("Please include an '@' in the email address");
     } else {
       (async () => {
-        await fetch('http://localhost:3000/auth/login', {
+        await fetch('http://localhost:3000/auth/signUp', {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
           method: 'POST',
-          body: JSON.stringify({
+          body: JSON.stringify( {
+            name: this.state.name,
             email: this.state.email,
             password: this.state.password,
+            passwordConfirmation: this.state.passwordConfirmation,
           }),
         }).then(res => res.json())
           .then(response => {
             if (response.error === undefined){
-              this.saveCookie(response.sessionId);
+              this.handleSnackBarOpen("Success!");
             } else {
               this.handleSnackBarOpen(response.error);
             }
@@ -134,28 +126,6 @@ class SignIn extends React.Component {
           .catch(error => console.error('Error:', error));
       })();
     }
-  };
-
-  handleSignUp = (event) => {
-    event.preventDefault();
-
-    (async () => {
-      await fetch('http://localhost:3000/auth/signUp', {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify({
-          name: 'foo',
-          email: 'foo@bar.com',
-          password: 'foo',
-          passwordConfirmation: 'foo',
-        }),
-      }).then(res => res.json())
-        .then(response => console.log('Success:', JSON.stringify(response)))
-        .catch(error => console.error('Error:', error));
-    })();
   };
 
   render() {
@@ -176,11 +146,21 @@ class SignIn extends React.Component {
                 <CardActions>
                   <TextField
                     className={classes.input}
+                    id="outlined-name"
+                    label="Name"
+                    margin="normal"
+                    variant="outlined"
+                    value={this.state.name}
+                    onChange={this.handleNameInput}
+                  />
+                </CardActions>
+                <CardActions>
+                  <TextField
+                    className={classes.input}
                     id="outlined-email-input"
                     label="Email"
                     type="email"
                     name="email"
-                    autoComplete="email"
                     margin="normal"
                     variant="outlined"
                     value={this.state.email}
@@ -190,10 +170,9 @@ class SignIn extends React.Component {
                 <CardActions>
                   <TextField
                     className={classes.input}
-                    id="outlined-password-input"
+                    id="outlined-passwordConfirmation-input"
                     label="Password"
                     type="password"
-                    autoComplete="current-password"
                     margin="normal"
                     variant="outlined"
                     value={this.state.password}
@@ -201,39 +180,23 @@ class SignIn extends React.Component {
                   />
                 </CardActions>
                 <CardActions>
-                  <Grid container spacing={24}>
-                    <Grid item xs={6}>
-                      <FormGroup row>
-                        <FormControlLabel
-                          className={classes.accountHandlers}
-                          control={(
-                            <Switch
-                              checked={this.state.rememberMe}
-                              onChange={this.handleChange('rememberMe')}
-                              value="rememberMe"
-                            />
-                          )}
-                          label="Remember Me"
-                        />
-                      </FormGroup>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Button color="primary" className={classes.accountHandlers}>
-                        Forgot Password
-                      </Button>
-                    </Grid>
-                  </Grid>
+                  <TextField
+                    className={classes.input}
+                    id="outlined-password-input"
+                    label="Confirm Password"
+                    type="password"
+                    margin="normal"
+                    variant="outlined"
+                    value={this.state.passwordConfirmation}
+                    onChange={this.handlePasswordConfirmationInput}
+                  />
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.login} onClick={this.handleLogin}>
-                    Log In
+                  <Button variant="contained" color="secondary" className={classes.signup} onClick={this.handleLogin}>
+                    Sign Up
                   </Button>
-
                 </CardActions>
               </Card>
-              <Button color="primary" className={classes.signUp} onClick={this.handleSignUp}>
-                Don't have an account yet? Sign Up
-              </Button>
             </Grid>
           </Grid>
         </Grid>
@@ -269,10 +232,8 @@ class SignIn extends React.Component {
   }
 }
 
-SignIn.propTypes = {
+SignUp.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  cookies: instanceOf(Cookies).isRequired
 };
 
-SignIn = withStyles(styles)(SignIn);
-export default withCookies(SignIn);
+export default withStyles(styles)(SignUp);
