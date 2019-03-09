@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
@@ -8,8 +8,8 @@ import Grid from '@material-ui/core/Grid/Grid';
 import CloseIcon from '@material-ui/icons/Close';
 import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import IconButton from '@material-ui/core/IconButton/IconButton';
-import withStyles from "@material-ui/core/es/styles/withStyles";
-import { Redirect } from "react-router-dom";
+import withStyles from '@material-ui/core/es/styles/withStyles';
+import { Redirect } from 'react-router-dom';
 
 
 const styles = theme => ({
@@ -48,7 +48,7 @@ class ForgotPassword extends React.Component {
     email: '',
     error: false,
     errorMsg: '',
-    toLogIn: false
+    toLogIn: false,
   };
 
   handleEmailInput = (event) => {
@@ -75,14 +75,14 @@ class ForgotPassword extends React.Component {
     event.preventDefault();
 
     if (this.state.email === '') {
-      this.handleSnackBarOpen("Please enter your email address");
+      this.handleSnackBarOpen('Please enter your email address');
     } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen("Please provide a valid email address");
+      this.handleSnackBarOpen('Please provide a valid email address');
     } else {
       this.setState({
         email: '',
       });
-      this.handleSnackBarOpen("Email sent... (functionality not currently available)");
+      this.handleSnackBarOpen('Email sent... (functionality not currently available)');
     }
   };
 
@@ -90,15 +90,15 @@ class ForgotPassword extends React.Component {
     event.preventDefault();
 
     this.setState({
-      toLogIn: true
+      toLogIn: true,
     });
   };
 
   render() {
     const { classes } = this.props;
 
-    if (this.state.toLogIn === true){
-      return <Redirect to='/' />
+    if (this.state.toLogIn === true) {
+      return <Redirect to="/" />;
     }
 
     return (

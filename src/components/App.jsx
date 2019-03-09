@@ -1,9 +1,20 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import SignUp from './SignUp'
-import LogIn from "./LogIn";
-import ForgotPassword from "./ForgotPassword";
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import SignUp from './SignUp';
+import LogIn from './LogIn';
+import ForgotPassword from './ForgotPassword';
 
+function LogInPage() {
+  return <LogIn />;
+}
+
+function SignUpPage() {
+  return <SignUp />;
+}
+
+function ForgotPasswordPage() {
+  return <ForgotPassword />;
+}
 
 export default function App() {
   return (
@@ -15,16 +26,4 @@ export default function App() {
       </div>
     </Router>
   );
-}
-
-function LogInPage() {
-  return <LogIn/>;
-}
-
-function SignUpPage() {
-  return <SignUp/>;
-}
-
-function ForgotPasswordPage() {
-  return <ForgotPassword/>;
 }

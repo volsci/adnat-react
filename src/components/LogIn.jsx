@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes, { instanceOf } from "prop-types";
+import PropTypes, { instanceOf } from 'prop-types';
 import { withCookies, Cookies } from 'react-cookie';
 import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from 'react-router-dom';
@@ -58,7 +58,7 @@ class LogIn extends React.Component {
     error: false,
     errorMsg: '',
     toSignUp: false,
-    toForgotPassword: false
+    toForgotPassword: false,
   };
 
   handleEmailInput = (event) => {
@@ -81,7 +81,7 @@ class LogIn extends React.Component {
     event.preventDefault();
 
     this.setState({
-      toForgotPassword: true
+      toForgotPassword: true,
     });
   };
 
@@ -117,9 +117,9 @@ class LogIn extends React.Component {
     event.preventDefault();
 
     if (this.state.email === '' || this.state.password === '') {
-      this.handleSnackBarOpen("Please enter your email address and password");
+      this.handleSnackBarOpen('Please enter your email address and password');
     } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen("Please provide a valid email address");
+      this.handleSnackBarOpen('Please provide a valid email address');
     } else {
       (async () => {
         await fetch('http://localhost:3000/auth/forgotPassword', {
@@ -133,13 +133,12 @@ class LogIn extends React.Component {
             password: this.state.password,
           }),
         }).then(res => res.json())
-          .then(response => {
-            if (response.error === undefined){
+          .then((response) => {
+            if (response.error === undefined) {
               this.saveCookie(response.sessionId);
             } else {
               this.handleSnackBarOpen(response.error);
             }
-
           })
           .catch(error => console.error('Error:', error));
       })();
@@ -150,19 +149,19 @@ class LogIn extends React.Component {
     event.preventDefault();
 
     this.setState({
-      toSignUp: true
+      toSignUp: true,
     });
   };
 
   render() {
     const { classes } = this.props;
 
-    if (this.state.toSignUp === true){
-      return <Redirect to='/signup' />
+    if (this.state.toSignUp === true) {
+      return <Redirect to="/signup" />;
     }
 
-    if (this.state.toForgotPassword === true){
-      return <Redirect to='/forgotpass' />
+    if (this.state.toForgotPassword === true) {
+      return <Redirect to="/forgotpass" />;
     }
 
     return (
@@ -236,7 +235,7 @@ class LogIn extends React.Component {
                 </CardActions>
               </Card>
               <Button color="primary" className={classes.signUp} onClick={this.handleSignUp}>
-                Don't have an account yet? Sign Up
+                {"Don't have an account yet? Sign Up'"}
               </Button>
             </Grid>
           </Grid>
@@ -275,8 +274,8 @@ class LogIn extends React.Component {
 
 LogIn.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  cookies: instanceOf(Cookies).isRequired
+  cookies: instanceOf(Cookies).isRequired,
 };
 
-LogIn = withStyles(styles)(LogIn);
+LogIn = withStyles(styles)(LogIn); // eslint-disable-line no-class-assign
 export default withCookies(LogIn);

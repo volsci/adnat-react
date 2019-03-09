@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -9,7 +9,7 @@ import Grid from '@material-ui/core/Grid/Grid';
 import CloseIcon from '@material-ui/icons/Close';
 import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import IconButton from '@material-ui/core/IconButton/IconButton';
-import withStyles from "@material-ui/core/es/styles/withStyles";
+import withStyles from '@material-ui/core/es/styles/withStyles';
 
 const styles = theme => ({
   root: {
@@ -50,7 +50,7 @@ class SignUp extends React.Component {
     passwordConfirmation: '',
     error: false,
     errorMsg: '',
-    toLogIn: false
+    toLogIn: false,
   };
 
   handleNameInput = (event) => {
@@ -94,13 +94,13 @@ class SignUp extends React.Component {
   handleSignUp = (event) => {
     event.preventDefault();
 
-    if (this.state.name === '' ||
-      this.state.email === '' ||
-      this.state.password === '' ||
-      this.state.passwordConfirmation === '') {
-      this.handleSnackBarOpen("Please provide all of the required details");
+    if (this.state.name === ''
+      || this.state.email === ''
+      || this.state.password === ''
+      || this.state.passwordConfirmation === '') {
+      this.handleSnackBarOpen('Please provide all of the required details');
     } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen("Please provide a valid email address");
+      this.handleSnackBarOpen('Please provide a valid email address');
     } else {
       (async () => {
         await fetch('http://localhost:3000/auth/signUp', {
@@ -109,25 +109,23 @@ class SignUp extends React.Component {
             'Content-Type': 'application/json',
           },
           method: 'POST',
-          body: JSON.stringify( {
+          body: JSON.stringify({
             name: this.state.name,
             email: this.state.email,
             password: this.state.password,
             passwordConfirmation: this.state.passwordConfirmation,
           }),
         }).then(res => res.json())
-          .then(response => {
-            if (response.error === undefined){
-              this.handleSnackBarOpen("Success! Account created, please log in with your provided details");
+          .then((response) => {
+            if (response.error === undefined) {
+              this.handleSnackBarOpen('Success! Account created, please log in with your provided details');
 
               this.setState({
-                toLogIn: true
+                toLogIn: true,
               });
-
             } else {
               this.handleSnackBarOpen(response.error);
             }
-
           })
           .catch(error => console.error('Error:', error));
       })();
@@ -138,15 +136,15 @@ class SignUp extends React.Component {
     event.preventDefault();
 
     this.setState({
-      toLogIn: true
+      toLogIn: true,
     });
   };
 
   render() {
     const { classes } = this.props;
 
-    if (this.state.toLogIn === true){
-      return <Redirect to='/' />
+    if (this.state.toLogIn === true) {
+      return <Redirect to="/" />;
     }
 
     return (
