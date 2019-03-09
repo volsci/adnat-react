@@ -34,7 +34,7 @@ const styles = theme => ({
     margin: theme.spacing.unit,
     width: '100%',
   },
-  signup: {
+  forgotPassword: {
     margin: theme.spacing.unit,
     width: '100%',
     marginLeft: 'auto',
@@ -112,7 +112,7 @@ class LogIn extends React.Component {
       this.handleSnackBarOpen("Please include an '@' in the email address");
     } else {
       (async () => {
-        await fetch('http://localhost:3000/auth/signup', {
+        await fetch('http://localhost:3000/auth/forgotPassword', {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
@@ -225,7 +225,7 @@ class LogIn extends React.Component {
                   </Grid>
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.signup} onClick={this.handleLogin}>
+                  <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleLogin}>
                     Log In
                   </Button>
 

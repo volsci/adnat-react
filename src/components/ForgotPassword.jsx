@@ -42,37 +42,16 @@ const styles = theme => ({
   },
 });
 
-class SignUp extends React.Component {
+class ForgotPassword extends React.Component {
   state = {
-    name: '',
     email: '',
-    password: '',
-    passwordConfirmation: '',
     error: false,
     errorMsg: '',
-  };
-
-  handleNameInput = (event) => {
-    this.setState({
-      name: event.target.value,
-    });
   };
 
   handleEmailInput = (event) => {
     this.setState({
       email: event.target.value,
-    });
-  };
-
-  handlePasswordInput = (event) => {
-    this.setState({
-      password: event.target.value,
-    });
-  };
-
-  handlePasswordConfirmationInput = (event) => {
-    this.setState({
-      passwordConfirmation: event.target.value,
     });
   };
 
@@ -90,41 +69,18 @@ class SignUp extends React.Component {
     });
   };
 
-  handleLogin = (event) => {
+  handleEmailPassword = (event) => {
     event.preventDefault();
 
-    if (this.state.name === '' ||
-      this.state.email === '' ||
-      this.state.password === '' ||
-      this.state.passwordConfirmation === '') {
-      this.handleSnackBarOpen("Please provide all of your details");
+    if (this.state.email === '') {
+      this.handleSnackBarOpen("Please provide your email address");
     } else if (!this.state.email.includes('@')) {
       this.handleSnackBarOpen("Please include an '@' in the email address");
     } else {
-      (async () => {
-        await fetch('http://localhost:3000/auth/signUp', {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          method: 'POST',
-          body: JSON.stringify( {
-            name: this.state.name,
-            email: this.state.email,
-            password: this.state.password,
-            passwordConfirmation: this.state.passwordConfirmation,
-          }),
-        }).then(res => res.json())
-          .then(response => {
-            if (response.error === undefined){
-              this.handleSnackBarOpen("Success!");
-            } else {
-              this.handleSnackBarOpen(response.error);
-            }
-
-          })
-          .catch(error => console.error('Error:', error));
-      })();
+      this.setState({
+        email: '',
+      });
+      this.handleSnackBarOpen("Email sent... (functionality not currently available)");
     }
   };
 
@@ -146,17 +102,6 @@ class SignUp extends React.Component {
                 <CardActions>
                   <TextField
                     className={classes.input}
-                    id="outlined-name"
-                    label="Name"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.name}
-                    onChange={this.handleNameInput}
-                  />
-                </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
                     id="outlined-email-input"
                     label="Email"
                     type="email"
@@ -167,33 +112,9 @@ class SignUp extends React.Component {
                     onChange={this.handleEmailInput}
                   />
                 </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-passwordConfirmation-input"
-                    label="Password"
-                    type="password"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.password}
-                    onChange={this.handlePasswordInput}
-                  />
-                </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-password-input"
-                    label="Confirm Password"
-                    type="password"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.passwordConfirmation}
-                    onChange={this.handlePasswordConfirmationInput}
-                  />
-                </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleLogin}>
-                    Sign Up
+                  <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleEmailPassword}>
+                    Send Me A Reset Password Link
                   </Button>
                 </CardActions>
               </Card>
@@ -232,8 +153,8 @@ class SignUp extends React.Component {
   }
 }
 
-SignUp.propTypes = {
+ForgotPassword.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
 };
 
-export default withStyles(styles)(SignUp);
+export default withStyles(styles)(ForgotPassword);

@@ -1,8 +1,8 @@
 import React from 'react';
-import SignUp from './SignUp';
+import ForgotPassword from "./ForgotPassword";
 
 export default function App() {
   return (
-    <SignUp />
+    <ForgotPassword />
   );
 }
