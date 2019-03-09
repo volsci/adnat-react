@@ -159,7 +159,7 @@ class ForgotPassword extends React.Component {
               aria-label="Close"
               color="inherit"
               className={classes.close}
-              onClick={this.handleClose}
+              onClick={this.handleSnackBarClose}
             >
               <CloseIcon />
             </IconButton>,
