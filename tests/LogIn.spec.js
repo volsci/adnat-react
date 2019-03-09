@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { shallow, mount, render } from 'enzyme';
 import LogIn from "../src/components/LogIn";
 import TextField from "@material-ui/core/TextField/TextField";
 import Button from '@material-ui/core/Button';
@@ -13,7 +13,7 @@ describe('LogIn', () => {
   });
 
   it('matches snapshot', () => {
-    const wrapper = shallow(<LogIn />);
+    const wrapper = render(<LogIn />);
 
     expect(wrapper).toMatchSnapshot();
   });
