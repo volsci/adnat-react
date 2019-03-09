@@ -9,6 +9,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import IconButton from '@material-ui/core/IconButton/IconButton';
 import withStyles from "@material-ui/core/es/styles/withStyles";
+import { Redirect } from "react-router-dom";
 
 
 const styles = theme => ({
@@ -47,6 +48,7 @@ class ForgotPassword extends React.Component {
     email: '',
     error: false,
     errorMsg: '',
+    toLogIn: false
   };
 
   handleEmailInput = (event) => {
@@ -73,9 +75,9 @@ class ForgotPassword extends React.Component {
     event.preventDefault();
 
     if (this.state.email === '') {
-      this.handleSnackBarOpen("Please provide your email address");
+      this.handleSnackBarOpen("Please enter your email address");
     } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen("Please include an '@' in the email address");
+      this.handleSnackBarOpen("Please provide a valid email address");
     } else {
       this.setState({
         email: '',
@@ -84,8 +86,20 @@ class ForgotPassword extends React.Component {
     }
   };
 
+  handleBack = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      toLogIn: true
+    });
+  };
+
   render() {
     const { classes } = this.props;
+
+    if (this.state.toLogIn === true){
+      return <Redirect to='/' />
+    }
 
     return (
       <Grid container className={classes.root}>
@@ -115,6 +129,11 @@ class ForgotPassword extends React.Component {
                 <CardActions disableActionSpacing>
                   <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleEmailPassword}>
                     Send Me A Reset Password Link
+                  </Button>
+                </CardActions>
+                <CardActions disableActionSpacing>
+                  <Button variant="contained" color="primary" className={classes.forgotPassword} onClick={this.handleBack}>
+                    Back
                   </Button>
                 </CardActions>
               </Card>

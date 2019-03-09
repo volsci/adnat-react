@@ -119,7 +119,7 @@ class LogIn extends React.Component {
     if (this.state.email === '' || this.state.password === '') {
       this.handleSnackBarOpen("Please enter your email address and password");
     } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen("Please include an '@' in the email address");
+      this.handleSnackBarOpen("Please provide a valid email address");
     } else {
       (async () => {
         await fetch('http://localhost:3000/auth/forgotPassword', {

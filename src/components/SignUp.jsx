@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from "prop-types";
+import { Redirect } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
@@ -9,7 +10,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import IconButton from '@material-ui/core/IconButton/IconButton';
 import withStyles from "@material-ui/core/es/styles/withStyles";
-
 
 const styles = theme => ({
   root: {
@@ -50,6 +50,7 @@ class SignUp extends React.Component {
     passwordConfirmation: '',
     error: false,
     errorMsg: '',
+    toLogIn: false
   };
 
   handleNameInput = (event) => {
@@ -90,16 +91,16 @@ class SignUp extends React.Component {
     });
   };
 
-  handleLogin = (event) => {
+  handleSignUp = (event) => {
     event.preventDefault();
 
     if (this.state.name === '' ||
       this.state.email === '' ||
       this.state.password === '' ||
       this.state.passwordConfirmation === '') {
-      this.handleSnackBarOpen("Please provide all of your details");
+      this.handleSnackBarOpen("Please provide all of the required details");
     } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen("Please include an '@' in the email address");
+      this.handleSnackBarOpen("Please provide a valid email address");
     } else {
       (async () => {
         await fetch('http://localhost:3000/auth/signUp', {
@@ -117,7 +118,12 @@ class SignUp extends React.Component {
         }).then(res => res.json())
           .then(response => {
             if (response.error === undefined){
-              this.handleSnackBarOpen("Success!");
+              this.handleSnackBarOpen("Success! Account created, please log in with your provided details");
+
+              this.setState({
+                toLogIn: true
+              });
+
             } else {
               this.handleSnackBarOpen(response.error);
             }
@@ -128,8 +134,20 @@ class SignUp extends React.Component {
     }
   };
 
+  handleBack = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      toLogIn: true
+    });
+  };
+
   render() {
     const { classes } = this.props;
+
+    if (this.state.toLogIn === true){
+      return <Redirect to='/' />
+    }
 
     return (
       <Grid container className={classes.root}>
@@ -192,8 +210,13 @@ class SignUp extends React.Component {
                   />
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleLogin}>
+                  <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleSignUp}>
                     Sign Up
+                  </Button>
+                </CardActions>
+                <CardActions disableActionSpacing>
+                  <Button variant="contained" color="primary" className={classes.forgotPassword} onClick={this.handleBack}>
+                    Back
                   </Button>
                 </CardActions>
               </Card>
