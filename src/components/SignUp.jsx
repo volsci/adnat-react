@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes, { instanceOf } from "prop-types";
+import PropTypes, { instanceOf } from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import { withCookies, Cookies } from 'react-cookie';
 import Card from '@material-ui/core/Card';
@@ -57,7 +57,7 @@ class SignUp extends React.Component {
     error: false,
     errorMsg: '',
     toLogIn: false,
-    authenticated: false
+    authenticated: false,
   };
 
   componentWillMount() {
@@ -65,11 +65,11 @@ class SignUp extends React.Component {
 
     if (JSON.stringify(cookies.get('sessionId')) !== '') {
       this.setState({
-        authenticated: true
+        authenticated: true,
       });
     } else {
       this.setState({
-        authenticated: false
+        authenticated: false,
       });
     }
   }

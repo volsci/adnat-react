@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes, { instanceOf } from "prop-types";
+import PropTypes, { instanceOf } from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Redirect } from 'react-router-dom';
 import { withCookies, Cookies } from 'react-cookie';
@@ -53,7 +53,7 @@ class ForgotPassword extends React.Component {
     error: false,
     errorMsg: '',
     toLogIn: false,
-    authenticated: false
+    authenticated: false,
 
   };
 
@@ -62,11 +62,11 @@ class ForgotPassword extends React.Component {
 
     if (JSON.stringify(cookies.get('sessionId')) !== '') {
       this.setState({
-        authenticated: true
+        authenticated: true,
       });
     } else {
       this.setState({
-        authenticated: false
+        authenticated: false,
       });
     }
   }

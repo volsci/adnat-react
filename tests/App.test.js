@@ -2,7 +2,6 @@ import React from 'react';
 import { render, shallow } from "enzyme";
 
 import App from '../src/components/App';
-import ForgotPassword from "../src/components/ForgotPassword";
 
 describe('App', () => {
   it('renders', () => {

@@ -7,9 +7,8 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-
+import ArrowBack from '@material-ui/icons/ArrowBack';
+import Button from '@material-ui/core/Button';
 
 const styles = theme => ({
   root: {
@@ -24,7 +23,7 @@ const styles = theme => ({
   },
 });
 
-class Dashboard extends React.Component {
+class Account extends React.Component {
   state = {
     authenticated: false,
   };
@@ -58,16 +57,12 @@ class Dashboard extends React.Component {
         <AppBar position="static">
           <Toolbar>
             <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-              <MenuIcon />
+              <ArrowBack />
             </IconButton>
             <Typography variant="h6" color="inherit" className={classes.grow}>
-              Dashboard
+              Account
             </Typography>
-            <IconButton
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            <Button color="inherit">Logout</Button>
           </Toolbar>
         </AppBar>
       </div>
@@ -75,10 +70,10 @@ class Dashboard extends React.Component {
   }
 }
 
-Dashboard.propTypes = {
+Account.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   cookies: instanceOf(Cookies).isRequired,
 };
 
-Dashboard = withStyles(styles)(Dashboard); // eslint-disable-line no-class-assign
-export default withCookies(Dashboard);
+Account = withStyles(styles)(Account); // eslint-disable-line no-class-assign
+export default withCookies(Account);

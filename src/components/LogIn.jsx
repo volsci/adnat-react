@@ -65,7 +65,7 @@ class LogIn extends React.Component {
     toSignUp: false,
     toForgotPassword: false,
     toDashboard: false,
-    authenticated: false
+    authenticated: false,
   };
 
   componentWillMount() {
@@ -73,11 +73,11 @@ class LogIn extends React.Component {
 
     if (JSON.stringify(cookies.get('sessionId')) !== '') {
       this.setState({
-        authenticated: true
+        authenticated: true,
       });
     } else {
       this.setState({
-        authenticated: false
+        authenticated: false,
       });
     }
   }
@@ -172,7 +172,7 @@ class LogIn extends React.Component {
             if (response.error === undefined) {
               this.saveCookie(response.sessionId);
               this.setState({
-                toDashboard: true
+                toDashboard: true,
               });
             } else {
               this.handleSnackBarOpen(response.error);
