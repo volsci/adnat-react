@@ -157,7 +157,7 @@ class LogIn extends React.Component {
       this.handleSnackBarOpen('Please provide a valid email address');
     } else {
       (async () => {
-        await fetch('http://localhost:3000/auth/forgotPassword', {
+        await fetch('http://localhost:3000/auth/login', {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
