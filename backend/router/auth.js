@@ -56,7 +56,7 @@ router.post("/signUp", (req, res) => {
     });
 });
 
-router.post("/forgotPassword", (req, res) => {
+router.post("/login", (req, res) => {
   const { email, password: plaintextPassword } = req.body;
   const sessionId = uuidv4();
 
