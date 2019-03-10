@@ -18,15 +18,31 @@
       "<rootDir>/node_modules/",
       "<rootDir>/tests/setup/",
       "<rootDir>/cypress"
+    ],
+    "transform": {
+      "^.+\\.jsx$": "babel-jest",
+      "^.+\\.js$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      ",<rootDir>/node_modules/"
     ]
   },
   "dependencies": {
+    "@babel/polyfill": "^7.2.5",
     "@material-ui/core": "^3.9.2",
+    "@material-ui/icons": "^3.0.2",
     "eslint": "^5.15.1",
+    "nodemailer": "^5.1.1",
+    "prop-types": "^15.7.2",
     "react": "^16.8.4",
-    "react-dom": "^16.8.4"
+    "react-cookie": "^3.0.8",
+    "react-dom": "^16.8.4",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
     "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.1",
