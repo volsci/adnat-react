@@ -14,5 +14,5 @@ parserOptions:
 plugins:
   - react
 rules: {
-  react/destructuring-assignment: 1
+  react/destructuring-assignment: 0
 }

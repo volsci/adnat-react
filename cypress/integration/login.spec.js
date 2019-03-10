@@ -42,5 +42,27 @@ describe('Log in', () => {
       .click()
       .location('pathname').should('eq', '/signup')
   });
+
+  it('catches invalid emails', () => {
+    cy.get('#outlined-email-input')
+      .type('foo');
+
+    cy.get('#outlined-password-input')
+      .type('foo');
+
+    cy.get('.MuiCardActions-disableActionSpacing-135')
+      .click();
+
+    cy.get('.MuiSnackbar-root-283 > .MuiTypography-root-221')
+      .should('have.length', 1);
+  });
+
+  it('catches empty strings', () => {
+    cy.get('.MuiCardActions-disableActionSpacing-135')
+      .click();
+
+    cy.get('.MuiSnackbar-root-283 > .MuiTypography-root-221')
+      .should('have.length', 1);
+  });
 });
 

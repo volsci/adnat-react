@@ -36,5 +36,39 @@ describe('Sign Up', () => {
       .click()
       .location('pathname').should('eq', '/')
   });
+
+  it('catches invalid emails', () => {
+    cy.get('#outlined-name')
+      .type('foo');
+
+    cy.get('#outlined-email-input')
+      .type('foo');
+
+    cy.get('#outlined-password-input')
+      .type('foo');
+
+    cy.get('#outlined-passwordConfirmation-input')
+      .type('foo');
+
+    cy.get('.MuiPaper-root-106 > :nth-child(5)')
+      .click();
+
+    cy.get('.MuiTypography-root-236')
+      .should('have.length', 1);
+  });
+
+  it('catches empty strings', () => {
+    cy.get('.MuiPaper-root-106 > :nth-child(5)')
+      .click();
+
+    cy.get('.MuiTypography-root-236')
+      .should('have.length', 1);
+  });
+
+  it('has a working back button', () => {
+    cy.get('.MuiPaper-root-106 > :nth-child(6)')
+      .click()
+      .location('pathname').should('eq', '/')
+  });
 });
 
