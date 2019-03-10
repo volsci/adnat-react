@@ -64,6 +64,7 @@ class LogIn extends React.Component {
     errorMsg: '',
     toSignUp: false,
     toForgotPassword: false,
+    toDashboard: false
   };
 
   handleEmailInput = (event) => {
@@ -155,6 +156,9 @@ class LogIn extends React.Component {
           .then((response) => {
             if (response.error === undefined) {
               this.saveCookie(response.sessionId);
+              this.setState({
+                toDashboard: true
+              });
             } else {
               this.handleSnackBarOpen(response.error);
             }
@@ -189,6 +193,14 @@ class LogIn extends React.Component {
      */
     if (this.state.toForgotPassword === true) {
       return <Redirect to="/forgotpass" />;
+    }
+
+    /**
+     * Using react-router, if the correct state is detected the redirect component
+     * will send the user to the dashboard.
+     */
+    if (this.state.toDashboard === true) {
+      return <Redirect to="/dashboard" />;
     }
 
     return (

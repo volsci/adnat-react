@@ -11,16 +11,22 @@ class Dashboard extends React.Component {
   componentWillMount() {
     const { cookies } = this.props;
 
-    if (cookies.getAll().hasOwnProperty('sessionId')) {
+    console.log(cookies.get('sessionId'));
+
+    if (JSON.stringify(cookies.get('sessionId')) !== '') {
       this.setState({
         authenticated: true
+      });
+    } else {
+      this.setState({
+        authenticated: false
       });
     }
   }
 
   render() {
 
-    if (this.state.authenticated === true) {
+    if (this.state.authenticated === false) {
       return <Redirect to="/" />;
     }
 
