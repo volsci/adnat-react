@@ -64,8 +64,23 @@ class LogIn extends React.Component {
     errorMsg: '',
     toSignUp: false,
     toForgotPassword: false,
-    toDashboard: false
+    toDashboard: false,
+    authenticated: false
   };
+
+  componentWillMount() {
+    const { cookies } = this.props;
+
+    if (JSON.stringify(cookies.get('sessionId')) !== '') {
+      this.setState({
+        authenticated: true
+      });
+    } else {
+      this.setState({
+        authenticated: false
+      });
+    }
+  }
 
   handleEmailInput = (event) => {
     this.setState({
@@ -200,6 +215,13 @@ class LogIn extends React.Component {
      * will send the user to the dashboard.
      */
     if (this.state.toDashboard === true) {
+      return <Redirect to="/dashboard" />;
+    }
+
+    /**
+     * If a session ID is detected, the user is sent to the dashboard.
+     */
+    if (this.state.authenticated === true) {
       return <Redirect to="/dashboard" />;
     }
 

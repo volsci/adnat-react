@@ -11,8 +11,6 @@ class Dashboard extends React.Component {
   componentWillMount() {
     const { cookies } = this.props;
 
-    console.log(cookies.get('sessionId'));
-
     if (JSON.stringify(cookies.get('sessionId')) !== '') {
       this.setState({
         authenticated: true
@@ -25,7 +23,9 @@ class Dashboard extends React.Component {
   }
 
   render() {
-
+    /**
+     * If a session ID was not detected, the user is sent to the login page.
+     */
     if (this.state.authenticated === false) {
       return <Redirect to="/" />;
     }

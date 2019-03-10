@@ -1,5 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { instanceOf } from "prop-types";
+import { withStyles } from '@material-ui/core/styles';
+import { Redirect } from 'react-router-dom';
+import { withCookies, Cookies } from 'react-cookie';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
@@ -8,9 +11,6 @@ import Grid from '@material-ui/core/Grid/Grid';
 import CloseIcon from '@material-ui/icons/Close';
 import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import IconButton from '@material-ui/core/IconButton/IconButton';
-import withStyles from '@material-ui/core/es/styles/withStyles';
-import { Redirect } from 'react-router-dom';
-
 
 const styles = theme => ({
   root: {
@@ -53,7 +53,23 @@ class ForgotPassword extends React.Component {
     error: false,
     errorMsg: '',
     toLogIn: false,
+    authenticated: false
+
   };
+
+  componentWillMount() {
+    const { cookies } = this.props;
+
+    if (JSON.stringify(cookies.get('sessionId')) !== '') {
+      this.setState({
+        authenticated: true
+      });
+    } else {
+      this.setState({
+        authenticated: false
+      });
+    }
+  }
 
   handleEmailInput = (event) => {
     this.setState({
@@ -113,6 +129,13 @@ class ForgotPassword extends React.Component {
      */
     if (this.state.toLogIn === true) {
       return <Redirect to="/" />;
+    }
+
+    /**
+     * If a session ID is detected, the user is sent to the dashboard.
+     */
+    if (this.state.authenticated === true) {
+      return <Redirect to="/dashboard" />;
     }
 
     return (
@@ -186,6 +209,8 @@ class ForgotPassword extends React.Component {
 
 ForgotPassword.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  cookies: instanceOf(Cookies).isRequired,
 };
 
-export default withStyles(styles)(ForgotPassword);
+ForgotPassword = withStyles(styles)(ForgotPassword); // eslint-disable-line no-class-assign
+export default withCookies(ForgotPassword);

@@ -1,6 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { instanceOf } from "prop-types";
 import { Redirect } from 'react-router-dom';
+import { withCookies, Cookies } from 'react-cookie';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
@@ -56,7 +57,22 @@ class SignUp extends React.Component {
     error: false,
     errorMsg: '',
     toLogIn: false,
+    authenticated: false
   };
+
+  componentWillMount() {
+    const { cookies } = this.props;
+
+    if (JSON.stringify(cookies.get('sessionId')) !== '') {
+      this.setState({
+        authenticated: true
+      });
+    } else {
+      this.setState({
+        authenticated: false
+      });
+    }
+  }
 
   handleNameInput = (event) => {
     this.setState({
@@ -94,6 +110,15 @@ class SignUp extends React.Component {
       error: false,
       errorMsg: '',
     });
+  };
+
+  /**
+   * When a user is successfully authenticated, they receive a session ID. This
+   * session ID is saved as a cookie, using react-cookie.
+   */
+  saveCookie = (sessionId) => {
+    const { cookies } = this.props;
+    cookies.set('sessionId', sessionId, { path: '/' });
   };
 
   /**
@@ -159,6 +184,13 @@ class SignUp extends React.Component {
      */
     if (this.state.toLogIn === true) {
       return <Redirect to="/" />;
+    }
+
+    /**
+     * If a session ID is detected, the user is sent to the dashboard.
+     */
+    if (this.state.authenticated === true) {
+      return <Redirect to="/dashboard" />;
     }
 
     return (
@@ -267,6 +299,8 @@ class SignUp extends React.Component {
 
 SignUp.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  cookies: instanceOf(Cookies).isRequired,
 };
 
-export default withStyles(styles)(SignUp);
+SignUp = withStyles(styles)(SignUp); // eslint-disable-line no-class-assign
+export default withCookies(SignUp);
