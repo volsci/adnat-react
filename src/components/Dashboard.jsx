@@ -26,25 +26,42 @@ const styles = theme => ({
 
 class Dashboard extends React.Component {
   state = {
+    toAccount: false,
     authenticated: false,
   };
 
   componentWillMount() {
     const { cookies } = this.props;
 
-    if (JSON.stringify(cookies.get('sessionId')) !== '') {
+    if (JSON.stringify(cookies.get('sessionId')) === undefined) {
       this.setState({
-        authenticated: true,
+        authenticated: false,
       });
     } else {
       this.setState({
-        authenticated: false,
+        authenticated: true,
       });
     }
   }
 
+  handleAccountButton = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      toAccount: true,
+    });
+  };
+
   render() {
     const { classes } = this.props;
+
+    /**
+     * Using react-router, if the correct state is detected the redirect component
+     * will send the user to the account page.
+     */
+    if (this.state.toAccount === true) {
+      return <Redirect to="/account" />;
+    }
 
     /**
      * If a session ID was not detected, the user is sent to the login page.
@@ -63,10 +80,8 @@ class Dashboard extends React.Component {
             <Typography variant="h6" color="inherit" className={classes.grow}>
               Dashboard
             </Typography>
-            <IconButton
-              color="inherit"
-            >
-              <AccountCircle />
+            <IconButton color="inherit" onClick={this.handleAccountButton}>
+              <AccountCircle/>
             </IconButton>
           </Toolbar>
         </AppBar>

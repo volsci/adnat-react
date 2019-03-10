@@ -25,25 +25,69 @@ const styles = theme => ({
 
 class Account extends React.Component {
   state = {
+    toDashboard: false,
     authenticated: false,
   };
 
   componentWillMount() {
     const { cookies } = this.props;
 
-    if (JSON.stringify(cookies.get('sessionId')) !== '') {
+    if (JSON.stringify(cookies.get('sessionId')) === undefined) {
       this.setState({
-        authenticated: true,
+        authenticated: false,
       });
     } else {
       this.setState({
-        authenticated: false,
+        authenticated: true,
       });
     }
   }
 
+  handleBack = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      toDashboard: true,
+    });
+  };
+
+  handleLogout = (event) => {
+    event.preventDefault();
+    const { cookies } = this.props;
+
+    (async () => {
+      await fetch('http://localhost:3000/auth/logout', {
+        headers: {
+          "Authorization": cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'DELETE',
+      }).then((response) => {
+          if (response.error === undefined) {
+            cookies.remove('sessionId');
+            this.setState({
+              authenticated: false,
+            });
+          } else {
+            console.log(response.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    })();
+
+
+  };
+
   render() {
     const { classes } = this.props;
+
+    /**
+     * Using react-router, if the correct state is detected the redirect component
+     * will send the user to the dashboard.
+     */
+    if (this.state.toDashboard === true) {
+      return <Redirect to="/dashboard" />;
+    }
 
     /**
      * If a session ID was not detected, the user is sent to the login page.
@@ -56,13 +100,15 @@ class Account extends React.Component {
       <div className={classes.root}>
         <AppBar position="static">
           <Toolbar>
-            <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
+            <IconButton className={classes.menuButton} color="inherit" aria-label="Menu" onClick={this.handleBack}>
               <ArrowBack />
             </IconButton>
             <Typography variant="h6" color="inherit" className={classes.grow}>
               Account
             </Typography>
-            <Button color="inherit">Logout</Button>
+            <Button color="inherit" onClick={this.handleLogout}>
+              Logout
+            </Button>
           </Toolbar>
         </AppBar>
       </div>

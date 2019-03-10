@@ -60,13 +60,13 @@ class ForgotPassword extends React.Component {
   componentWillMount() {
     const { cookies } = this.props;
 
-    if (JSON.stringify(cookies.get('sessionId')) !== '') {
+    if (JSON.stringify(cookies.get('sessionId')) === undefined) {
       this.setState({
-        authenticated: true,
+        authenticated: false,
       });
     } else {
       this.setState({
-        authenticated: false,
+        authenticated: true,
       });
     }
   }
