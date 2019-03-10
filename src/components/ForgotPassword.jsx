@@ -169,7 +169,7 @@ class ForgotPassword extends React.Component {
                   </Button>
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="primary" className={classes.forgotPassword} onClick={this.handleBack}>
+                  <Button variant="contained" className={classes.forgotPassword} onClick={this.handleBack}>
                     Back
                   </Button>
                 </CardActions>

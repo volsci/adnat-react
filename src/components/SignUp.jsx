@@ -56,7 +56,6 @@ class SignUp extends React.Component {
     passwordConfirmation: '',
     error: false,
     errorMsg: '',
-    toLogIn: false,
     authenticated: false,
   };
 
@@ -136,6 +135,8 @@ class SignUp extends React.Component {
       this.handleSnackBarOpen('Please provide all of the required details');
     } else if (!this.state.email.includes('@')) {
       this.handleSnackBarOpen('Please provide a valid email address');
+    } else if (this.state.password.length < 6) {
+      this.handleSnackBarOpen('Please enter a password with six characters or more');
     } else {
       (async () => {
         await fetch('http://localhost:3000/auth/signUp', {
@@ -154,9 +155,10 @@ class SignUp extends React.Component {
           .then((response) => {
             if (response.error === undefined) {
               this.handleSnackBarOpen('Success! Account created, please log in with your provided details');
+              this.saveCookie(response.sessionId);
 
               this.setState({
-                toLogIn: true,
+                authenticated: true,
               });
             } else {
               this.handleSnackBarOpen(response.error);
@@ -177,14 +179,6 @@ class SignUp extends React.Component {
 
   render() {
     const { classes } = this.props;
-
-    /**
-     * Using react-router, if the correct state is detected the redirect component
-     * will return the user to the log in page.
-     */
-    if (this.state.toLogIn === true) {
-      return <Redirect to="/" />;
-    }
 
     /**
      * If a session ID is detected, the user is sent to the dashboard.
@@ -259,7 +253,7 @@ class SignUp extends React.Component {
                   </Button>
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="primary" className={classes.forgotPassword} onClick={this.handleBack}>
+                  <Button variant="contained" className={classes.forgotPassword} onClick={this.handleBack}>
                     Back
                   </Button>
                 </CardActions>

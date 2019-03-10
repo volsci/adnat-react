@@ -2,13 +2,20 @@ import React from 'react';
 import PropTypes, { instanceOf } from 'prop-types';
 import { Cookies, withCookies } from 'react-cookie';
 import { Redirect } from 'react-router-dom';
+import ReactHoverObserver from 'react-hover-observer'
 import { withStyles } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowBack from '@material-ui/icons/ArrowBack';
+import Edit from '@material-ui/icons/Edit';
 import Button from '@material-ui/core/Button';
+import Avatar from '@material-ui/core/Avatar';
+import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import Divider from '@material-ui/core/Divider';
 
 const styles = theme => ({
   root: {
@@ -21,12 +28,31 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
   },
+  avatar: {
+    margin: theme.spacing.unit,
+    width: 200,
+    height: 200,
+  },
+  card: {
+    margin: theme.spacing.unit * 3,
+    maxWidth: 400,
+    width: '100%',
+    height: '100%',
+  },
+  cardAction: {
+    margin: theme.spacing.unit,
+    maxWidth: 400,
+    width: '100%',
+    height: 50,
+  }
 });
 
 class Account extends React.Component {
   state = {
     toDashboard: false,
     authenticated: false,
+    name: '',
+    email: ''
   };
 
   componentWillMount() {
@@ -40,6 +66,33 @@ class Account extends React.Component {
       this.setState({
         authenticated: true,
       });
+    }
+  }
+
+  componentDidMount() {
+    const { cookies } = this.props;
+
+    if (this.state.authenticated === true) {
+      (async () => {
+        await fetch('http://localhost:3000/users/me', {
+          headers: {
+            "Authorization": cookies.get('sessionId'),
+            'Content-Type': 'application/json',
+          },
+          method: 'GET',
+        }).then(res => res.json())
+          .then((response) => {
+          if (response.error === undefined) {
+            this.setState({
+              name: response.name,
+              email: response.email
+            });
+          } else {
+            console.log(response.error);
+          }
+        })
+          .catch(error => console.error('Error:', error));
+      })();
     }
   }
 
@@ -74,8 +127,6 @@ class Account extends React.Component {
         })
         .catch(error => console.error('Error:', error));
     })();
-
-
   };
 
   render() {
@@ -111,7 +162,42 @@ class Account extends React.Component {
             </Button>
           </Toolbar>
         </AppBar>
+
+        <Grid container justify="center" alignItems="center" direction="column">
+          <Grid item>
+            <Avatar src="https://blogtimenow.com/wp-content/uploads/2014/06/hide-facebook-profile-picture-notification.jpg" className={classes.avatar} />
+          </Grid>
+          <Card className={classes.card}>
+            <ReactHoverObserver>
+              {({ isHovering }) => (
+                <CardActions disableActionSpacing className={classes.cardAction}>
+                  <Typography variant="h6" color="inherit" className={classes.grow}>
+                    {this.state.name}
+                  </Typography>
+                  <IconButton className={classes.menuButton} aria-label="Menu" >
+                    { isHovering ? <Edit /> : null }
+                  </IconButton>
+                </CardActions>
+              )}
+            </ReactHoverObserver>
+            <Divider variant="middle" />
+            <ReactHoverObserver>
+              {({ isHovering }) => (
+                <CardActions disableActionSpacing className={classes.cardAction}>
+                  <Typography variant="h6" color="inherit" className={classes.grow}>
+                    {this.state.email}
+                  </Typography>
+                  <IconButton className={classes.menuButton} aria-label="Menu" >
+                    { isHovering ? <Edit /> : null }
+                  </IconButton>
+                </CardActions>
+              )}
+            </ReactHoverObserver>
+          </Card>
+        </Grid>
+
       </div>
+
     );
   }
 }

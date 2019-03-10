@@ -282,7 +282,7 @@ class LogIn extends React.Component {
                       </FormGroup>
                     </Grid>
                     <Grid item xs={6}>
-                      <Button color="primary" className={classes.accountHandlers} onClick={this.handleForgotPassword}>
+                      <Button className={classes.accountHandlers} onClick={this.handleForgotPassword}>
                         Forgot Password
                       </Button>
                     </Grid>
@@ -295,8 +295,8 @@ class LogIn extends React.Component {
 
                 </CardActions>
               </Card>
-              <Button color="primary" className={classes.signUp} onClick={this.handleSignUp}>
-                {"Don't have an account yet? Sign Up'"}
+              <Button className={classes.signUp} onClick={this.handleSignUp}>
+                {"Don't have an account yet? Sign Up"}
               </Button>
             </Grid>
           </Grid>
