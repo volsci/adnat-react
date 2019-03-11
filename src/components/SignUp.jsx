@@ -18,7 +18,7 @@ const styles = theme => ({
   },
   card: {
     margin: theme.spacing.unit * 3,
-    maxWidth: 600,
+    width: 350,
     height: '100%',
   },
   control: {
@@ -181,6 +181,14 @@ class SignUp extends React.Component {
     const { classes } = this.props;
 
     /**
+     * Using react-router, if the correct state is detected the redirect component
+     * will return the user to the log in page.
+     */
+    if (this.state.toLogIn === true) {
+      return <Redirect to="/" />;
+    }
+
+    /**
      * If a session ID is detected, the user is sent to the dashboard.
      */
     if (this.state.authenticated === true) {
@@ -208,6 +216,7 @@ class SignUp extends React.Component {
                     variant="outlined"
                     value={this.state.name}
                     onChange={this.handleNameInput}
+                    fullWidth
                   />
                 </CardActions>
                 <CardActions>
@@ -221,6 +230,7 @@ class SignUp extends React.Component {
                     variant="outlined"
                     value={this.state.email}
                     onChange={this.handleEmailInput}
+                    fullWidth
                   />
                 </CardActions>
                 <CardActions>
@@ -233,6 +243,7 @@ class SignUp extends React.Component {
                     variant="outlined"
                     value={this.state.password}
                     onChange={this.handlePasswordInput}
+                    fullWidth
                   />
                 </CardActions>
                 <CardActions>
@@ -245,15 +256,16 @@ class SignUp extends React.Component {
                     variant="outlined"
                     value={this.state.passwordConfirmation}
                     onChange={this.handlePasswordConfirmationInput}
+                    fullWidth
                   />
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleSignUp}>
+                  <Button variant="contained" color="secondary" className={classes.forgotPassword} fullWidth onClick={this.handleSignUp}>
                     Sign Up
                   </Button>
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" className={classes.forgotPassword} onClick={this.handleBack}>
+                  <Button variant="contained" className={classes.forgotPassword} fullWidth onClick={this.handleBack}>
                     Back
                   </Button>
                 </CardActions>

@@ -50,6 +50,10 @@ const styles = theme => ({
     maxWidth: 400,
     width: '100%',
     height: 50,
+  },
+  button: {
+    flexGrow: 1,
+    width: '100%'
   }
 });
 
@@ -61,6 +65,7 @@ class Account extends React.Component {
     email: '',
     editName: '',
     editEmail: '',
+    editPassword: '',
     editedName: '',
     editedEmail: '',
     error: false,
@@ -150,6 +155,14 @@ class Account extends React.Component {
     });
   };
 
+  handleEditPassword = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      editPassword: !this.state.editPassword
+    })
+  };
+
   handleUpdateName = (event) => {
     event.preventDefault();
     const { cookies } = this.props;
@@ -218,14 +231,6 @@ class Account extends React.Component {
     }
   };
 
-  handleEditEmail = (event) => {
-    event.preventDefault();
-
-    this.setState({
-      editEmail: !this.state.editEmail
-    })
-  };
-
   handleLogout = (event) => {
     event.preventDefault();
     const { cookies } = this.props;
@@ -270,6 +275,7 @@ class Account extends React.Component {
 
     let nameField;
     let emailField;
+    let passwordField;
 
     /**
      * Using react-router, if the correct state is detected the redirect component
@@ -348,6 +354,20 @@ class Account extends React.Component {
                   </ReactHoverObserver>
     }
 
+    if (this.state.editPassword === true) {
+      passwordField =   <CardActions disableActionSpacing className={classes.cardAction}>
+                      <Button color="inherit" onClick={this.handleLogout}>
+                        Logout
+                      </Button>
+                    </CardActions>
+    } else {
+      passwordField =   <CardActions disableActionSpacing>
+                      <Button variant="contained" color="secondary" fullWidth onClick={this.handleEditPassword}>
+                        Change Your Password
+                      </Button>
+                    </CardActions>
+    }
+
     return (
       <div className={classes.root}>
         <AppBar position="static">
@@ -355,7 +375,7 @@ class Account extends React.Component {
             <IconButton className={classes.menuButton} color="inherit" aria-label="Menu" onClick={this.handleBack}>
               <ArrowBack />
             </IconButton>
-            <Typography variant="h6" color="inherit" className={classes.grow}>
+            <Typography variant="h6" color="inherit" className={classes.button}>
               Account
             </Typography>
             <Button color="inherit" onClick={this.handleLogout}>
@@ -372,6 +392,8 @@ class Account extends React.Component {
             {nameField}
             <Divider variant="middle" />
             {emailField}
+            <Divider variant="middle" />
+            {passwordField}
           </Card>
         </Grid>
 
