@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes, { instanceOf } from 'prop-types';
 import { Cookies, withCookies } from 'react-cookie';
 import { Redirect } from 'react-router-dom';
-import ReactHoverObserver from 'react-hover-observer'
+import ReactHoverObserver from 'react-hover-observer';
 import { withStyles } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -19,7 +19,7 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField/TextField';
-import Snackbar from "@material-ui/core/Snackbar/Snackbar";
+import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
@@ -64,8 +64,8 @@ const styles = theme => ({
   },
   button: {
     flexGrow: 1,
-    width: '100%'
-  }
+    width: '100%',
+  },
 });
 
 class Account extends React.Component {
@@ -83,7 +83,7 @@ class Account extends React.Component {
     editedPassword: '',
     editedPasswordConfirmation: '',
     error: false,
-    errorMsg: ''
+    errorMsg: '',
   };
 
   componentWillMount() {
@@ -107,21 +107,21 @@ class Account extends React.Component {
       (async () => {
         await fetch('http://localhost:3000/users/me', {
           headers: {
-            "Authorization": cookies.get('sessionId'),
+            Authorization: cookies.get('sessionId'),
             'Content-Type': 'application/json',
           },
           method: 'GET',
         }).then(res => res.json())
           .then((response) => {
-          if (response.error === undefined) {
-            this.setState({
-              name: response.name,
-              email: response.email
-            });
-          } else {
-            console.log(response.error);
-          }
-        })
+            if (response.error === undefined) {
+              this.setState({
+                name: response.name,
+                email: response.email,
+              });
+            } else {
+              console.log(response.error);
+            }
+          })
           .catch(error => console.error('Error:', error));
       })();
     }
@@ -131,7 +131,7 @@ class Account extends React.Component {
     event.preventDefault();
 
     this.setState({
-      toDashboard: true
+      toDashboard: true,
     });
   };
 
@@ -140,8 +140,8 @@ class Account extends React.Component {
 
     this.setState({
       editedName: this.state.name,
-      editName: !this.state.editName
-    })
+      editName: !this.state.editName,
+    });
   };
 
   handleNameChange = (event) => {
@@ -157,8 +157,8 @@ class Account extends React.Component {
 
     this.setState({
       editedEmail: this.state.email,
-      editEmail: !this.state.editEmail
-    })
+      editEmail: !this.state.editEmail,
+    });
   };
 
   handleEmailChange = (event) => {
@@ -173,8 +173,8 @@ class Account extends React.Component {
     event.preventDefault();
 
     this.setState({
-      editPassword: !this.state.editPassword
-    })
+      editPassword: !this.state.editPassword,
+    });
   };
 
   handleOldPasswordInput = (event) => {
@@ -211,7 +211,7 @@ class Account extends React.Component {
       (async () => {
         await fetch('http://localhost:3000/users/me', {
           headers: {
-            "Authorization": cookies.get('sessionId'),
+            Authorization: cookies.get('sessionId'),
             'Content-Type': 'application/json',
           },
           method: 'PUT',
@@ -223,7 +223,7 @@ class Account extends React.Component {
             if (response.error === undefined) {
               this.setState({
                 name: this.state.editedName,
-                editName: false
+                editName: false,
               });
               this.handleSnackBarOpen('Name Updated Successfully');
             } else {
@@ -247,7 +247,7 @@ class Account extends React.Component {
       (async () => {
         await fetch('http://localhost:3000/users/me', {
           headers: {
-            "Authorization": cookies.get('sessionId'),
+            Authorization: cookies.get('sessionId'),
             'Content-Type': 'application/json',
           },
           method: 'PUT',
@@ -259,7 +259,7 @@ class Account extends React.Component {
             if (response.error === undefined) {
               this.setState({
                 email: this.state.editedEmail,
-                editEmail: false
+                editEmail: false,
               });
               this.handleSnackBarOpen('Email Updated Successfully');
             } else {
@@ -285,28 +285,28 @@ class Account extends React.Component {
       (async () => {
         await fetch('http://localhost:3000/users/me/change_password', {
           headers: {
-            "Authorization": cookies.get('sessionId'),
+            Authorization: cookies.get('sessionId'),
             'Content-Type': 'application/json',
           },
           method: 'PUT',
           body: JSON.stringify({
             oldPassword: this.state.oldPassword,
             newPassword: this.state.editedPassword,
-            newPasswordConfirmation: this.state.editedPasswordConfirmation
+            newPasswordConfirmation: this.state.editedPasswordConfirmation,
           }),
         }).then((response) => {
-            if (response.error === undefined) {
-              this.setState({
-                editPassword: false,
-                oldPassword: '',
-                editedPassword: '',
-                editedPasswordConfirmation: '',
-              });
-              this.handleSnackBarOpen('Password Updated Successfully');
-            } else {
-              this.handleSnackBarOpen(response.error);
-            }
-          })
+          if (response.error === undefined) {
+            this.setState({
+              editPassword: false,
+              oldPassword: '',
+              editedPassword: '',
+              editedPasswordConfirmation: '',
+            });
+            this.handleSnackBarOpen('Password Updated Successfully');
+          } else {
+            this.handleSnackBarOpen(response.error);
+          }
+        })
           .catch(error => console.error('Error:', error));
       })();
     }
@@ -319,20 +319,20 @@ class Account extends React.Component {
     (async () => {
       await fetch('http://localhost:3000/auth/logout', {
         headers: {
-          "Authorization": cookies.get('sessionId'),
+          Authorization: cookies.get('sessionId'),
           'Content-Type': 'application/json',
         },
         method: 'DELETE',
       }).then((response) => {
-          if (response.error === undefined) {
-            cookies.remove('sessionId');
-            this.setState({
-              authenticated: false,
-            });
-          } else {
-            console.log(response.error);
-          }
-        })
+        if (response.error === undefined) {
+          cookies.remove('sessionId');
+          this.setState({
+            authenticated: false,
+          });
+        } else {
+          console.log(response.error);
+        }
+      })
         .catch(error => console.error('Error:', error));
     })();
   };
@@ -374,118 +374,129 @@ class Account extends React.Component {
     }
 
     if (this.state.editName === true) {
-      nameField =   <CardActions disableActionSpacing className={classes.cardAction}>
-                      <TextField
-                        id="standard-name"
-                        className={classes.grow}
-                        value={this.state.editedName}
-                        onChange={this.handleNameChange}
-                        margin="normal"
-                      />
-                      <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleUpdateName}>
-                        <Save />
-                      </IconButton>
-                      <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleEditName}>
-                        <Cancel />
-                      </IconButton>
-                    </CardActions>
+      nameField = (
+        <CardActions disableActionSpacing className={classes.cardAction}>
+          <TextField
+            id="standard-name"
+            className={classes.grow}
+            value={this.state.editedName}
+            onChange={this.handleNameChange}
+            margin="normal"
+          />
+          <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleUpdateName}>
+            <Save />
+          </IconButton>
+          <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleEditName}>
+            <Cancel />
+          </IconButton>
+        </CardActions>
+      );
     } else {
-      nameField = <ReactHoverObserver>
-                    {({ isHovering }) => (
-                      <CardActions disableActionSpacing className={classes.cardAction}>
-                        <Typography variant="h6" color="inherit" className={classes.grow}>
-                          {this.state.name}
-                        </Typography>
-                        <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleEditName}>
-                          { isHovering ? <Edit /> : null }
-                        </IconButton>
-                      </CardActions>
-                    )}
-                  </ReactHoverObserver>
+      nameField = (
+        <ReactHoverObserver>
+          {({ isHovering }) => (
+            <CardActions disableActionSpacing className={classes.cardAction}>
+              <Typography variant="h6" color="inherit" className={classes.grow}>
+                {this.state.name}
+              </Typography>
+              <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleEditName}>
+                { isHovering ? <Edit /> : null }
+              </IconButton>
+            </CardActions>
+          )}
+        </ReactHoverObserver>
+      );
     }
 
     if (this.state.editEmail === true) {
-      emailField =   <CardActions disableActionSpacing className={classes.cardAction}>
-                      <TextField
-                        id="standard-email"
-                        className={classes.grow}
-                        value={this.state.editedEmail}
-                        onChange={this.handleEmailChange}
-                        margin="normal"
-                      />
-                      <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleUpdateEmail}>
-                        <Save />
-                      </IconButton>
-                      <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleEditEmail}>
-                        <Cancel />
-                      </IconButton>
-                    </CardActions>
+      emailField = (
+        <CardActions disableActionSpacing className={classes.cardAction}>
+          <TextField
+            id="standard-email"
+            className={classes.grow}
+            value={this.state.editedEmail}
+            onChange={this.handleEmailChange}
+            margin="normal"
+          />
+          <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleUpdateEmail}>
+            <Save />
+          </IconButton>
+          <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleEditEmail}>
+            <Cancel />
+          </IconButton>
+        </CardActions>
+      );
     } else {
-      emailField = <ReactHoverObserver>
-                    {({ isHovering }) => (
-                      <CardActions disableActionSpacing className={classes.cardAction}>
-                        <Typography variant="h6" color="inherit" className={classes.grow}>
-                          {this.state.email}
-                        </Typography>
-                        <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleEditEmail}>
-                          { isHovering ? <Edit /> : null }
-                        </IconButton>
-                      </CardActions>
-                    )}
-                  </ReactHoverObserver>
+      emailField = (
+        <ReactHoverObserver>
+          {({ isHovering }) => (
+            <CardActions disableActionSpacing className={classes.cardAction}>
+              <Typography variant="h6" color="inherit" className={classes.grow}>
+                {this.state.email}
+              </Typography>
+              <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleEditEmail}>
+                { isHovering ? <Edit /> : null }
+              </IconButton>
+            </CardActions>
+          )}
+        </ReactHoverObserver>
+      );
     }
 
     if (this.state.editPassword === true) {
-      passwordField =   <Grid item>
-                          <CardActions disableActionSpacing className={classes.passwordCardAction}>
-                            <TextField
-                              id="outlined-oldPassword-input"
-                              label="Old Password"
-                              type="password"
-                              margin="normal"
-                              value={this.state.oldPassword}
-                              onChange={this.handleOldPasswordInput}
-                              fullWidth
-                            />
-                          </CardActions>
-                          <CardActions disableActionSpacing className={classes.passwordCardAction}>
-                            <TextField
-                              id="outlined-newPassword-input"
-                              label="New Password"
-                              type="password"
-                              margin="normal"
-                              value={this.state.editedPassword}
-                              onChange={this.handlePasswordChange}
-                              fullWidth
-                            />
-                          </CardActions>
-                          <CardActions disableActionSpacing className={classes.passwordCardAction}>
-                            <TextField
-                              id="outlined-passwordConfirmation-input"
-                              label="Confirm Password"
-                              type="password"
-                              margin="normal"
-                              value={this.state.editedPasswordConfirmation}
-                              onChange={this.handlePasswordChangeConfirmation}
-                              fullWidth
-                            />
-                        </CardActions>
-        <CardActions disableActionSpacing>
-                        <IconButton className={classes.passwordButton} aria-label="Menu" onClick={this.handleUpdatePassword}>
-                          <Save />
-                        </IconButton>
-                        <IconButton className={classes.passwordButton} aria-label="Menu" onClick={this.handleEditPassword}>
-                          <Cancel />
-                        </IconButton>
-        </CardActions>
-      </Grid>
-
+      passwordField = (
+        <Grid item>
+          <CardActions disableActionSpacing className={classes.passwordCardAction}>
+            <TextField
+              id="outlined-oldPassword-input"
+              label="Old Password"
+              type="password"
+              margin="normal"
+              value={this.state.oldPassword}
+              onChange={this.handleOldPasswordInput}
+              fullWidth
+            />
+          </CardActions>
+          <CardActions disableActionSpacing className={classes.passwordCardAction}>
+            <TextField
+              id="outlined-newPassword-input"
+              label="New Password"
+              type="password"
+              margin="normal"
+              value={this.state.editedPassword}
+              onChange={this.handlePasswordChange}
+              fullWidth
+            />
+          </CardActions>
+          <CardActions disableActionSpacing className={classes.passwordCardAction}>
+            <TextField
+              id="outlined-passwordConfirmation-input"
+              label="Confirm Password"
+              type="password"
+              margin="normal"
+              value={this.state.editedPasswordConfirmation}
+              onChange={this.handlePasswordChangeConfirmation}
+              fullWidth
+            />
+          </CardActions>
+          <CardActions disableActionSpacing>
+            <IconButton className={classes.passwordButton} aria-label="Menu" onClick={this.handleUpdatePassword}>
+              <Save />
+            </IconButton>
+            <IconButton className={classes.passwordButton} aria-label="Menu" onClick={this.handleEditPassword}>
+              <Cancel />
+            </IconButton>
+          </CardActions>
+        </Grid>
+      );
     } else {
-      passwordField =   <CardActions disableActionSpacing>
-                      <Button variant="contained" color="secondary" fullWidth onClick={this.handleEditPassword}>
+      passwordField = (
+        <CardActions disableActionSpacing>
+          <Button variant="contained" color="secondary" fullWidth onClick={this.handleEditPassword}>
                         Change Your Password
-                      </Button>
-                    </CardActions>
+          </Button>
+        </CardActions>
+      );
     }
 
     return (

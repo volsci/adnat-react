@@ -282,14 +282,22 @@ class LogIn extends React.Component {
                       </FormGroup>
                     </Grid>
                     <Grid item xs={6}>
-                      <Button className={classes.accountHandlers} onClick={this.handleForgotPassword}>
+                      <Button
+                        className={classes.accountHandlers}
+                        onClick={this.handleForgotPassword}
+                      >
                         Forgot Password
                       </Button>
                     </Grid>
                   </Grid>
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleLogin}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    className={classes.forgotPassword}
+                    onClick={this.handleLogin}
+                  >
                     Log In
                   </Button>
 

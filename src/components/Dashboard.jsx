@@ -10,8 +10,8 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import Divider from '@material-ui/core/Divider';
 import Shifts from './Shifts';
-import Divider from "@material-ui/core/Divider";
 
 
 const styles = theme => ({
@@ -37,7 +37,7 @@ class Dashboard extends React.Component {
   state = {
     toAccount: false,
     authenticated: false,
-    drawerOpen: false
+    drawerOpen: false,
   };
 
   componentWillMount() {
@@ -112,7 +112,7 @@ class Dashboard extends React.Component {
               Dashboard
             </Typography>
             <IconButton color="inherit" onClick={this.handleAccountButton}>
-              <AccountCircle/>
+              <AccountCircle />
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -126,7 +126,7 @@ class Dashboard extends React.Component {
             {drawerContents}
           </div>
         </Drawer>
-        <Shifts/>
+        <Shifts />
       </div>
     );
   }

@@ -22,7 +22,9 @@ const styles = theme => ({
 let id = 0;
 function createData(name, calories, fat, carbs, protein) {
   id += 1;
-  return { id, name, calories, fat, carbs, protein };
+  return {
+    id, name, calories, fat, carbs, protein,
+  };
 }
 
 const rows = [
@@ -67,7 +69,7 @@ function SimpleTable(props) {
 }
 
 SimpleTable.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
 };
 
 export default withStyles(styles)(SimpleTable);
