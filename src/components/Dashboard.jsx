@@ -55,6 +55,7 @@ class Dashboard extends React.Component {
     createNewOrganisation: false,
     newOrganisationName: '',
     newOrganisationHourly: 0,
+    currentOrganisationId: 0,
     error: false,
     errorMsg: '',
     organisations: []
@@ -91,7 +92,6 @@ class Dashboard extends React.Component {
               this.setState({
                 organisations: response
               });
-              console.log(this.state.organisations);
             } else {
               console.log(response.error);
             }
@@ -103,8 +103,6 @@ class Dashboard extends React.Component {
 
   handleAccountButton = (event) => {
     event.preventDefault();
-    const { cookies } = this.props;
-
 
     this.setState({
       toAccount: true,
@@ -183,7 +181,9 @@ class Dashboard extends React.Component {
             }),
           }).then(res => res.json())
             .then((response) => {
-              console.log(response.name)
+              this.setState({
+                currentOrganisationId: response.id
+              });
             })
             .catch(error => console.error('Error:', error));
         })();
@@ -334,7 +334,7 @@ class Dashboard extends React.Component {
             {drawerContents}
           </div>
         </Drawer>
-        <Shifts />
+        <Shifts organisationId={this.state.organisationId}/>
 
         <Snackbar
           anchorOrigin={{

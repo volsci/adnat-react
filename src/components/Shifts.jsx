@@ -1,6 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { instanceOf } from "prop-types";
 import { withStyles } from '@material-ui/core/styles';
+import { Cookies, withCookies } from 'react-cookie';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -35,41 +36,76 @@ const rows = [
   createData('Gingerbread', 356, 16.0, 49, 3.9),
 ];
 
-function SimpleTable(props) {
-  const { classes } = props;
 
-  return (
-    <Paper className={classes.root}>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat (g)</TableCell>
-            <TableCell align="right">Carbs (g)</TableCell>
-            <TableCell align="right">Protein (g)</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map(row => (
-            <TableRow key={row.id}>
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{row.calories}</TableCell>
-              <TableCell align="right">{row.fat}</TableCell>
-              <TableCell align="right">{row.carbs}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
+class Shifts extends React.Component {
+
+  componentDidMount() {
+    const { cookies } = this.props;
+    const { organisationId } = this.props;
+
+    (async () => {
+        await fetch('http://localhost:3000/shifts', {
+          headers: {
+            Authorization: cookies.get('sessionId'),
+            'Content-Type': 'application/json',
+          },
+          method: 'GET',
+        }).then(res => res.json())
+          .then((response) => {
+            if (response.error === undefined) {
+              console.log('works')
+              for (let i = 0; i < response.length; i++) {
+                if (response.id === organisationId) {
+                  console.log(response[i]);
+                }
+              }
+            } else {
+              console.log(response.error);
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      })();
+  }
+
+
+  render() {
+    const { classes } = this.props;
+
+    return (
+      <Paper className={classes.root}>
+        <Table className={classes.table}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Dessert (100g serving)</TableCell>
+              <TableCell align="right">Calories</TableCell>
+              <TableCell align="right">Fat (g)</TableCell>
+              <TableCell align="right">Carbs (g)</TableCell>
+              <TableCell align="right">Protein (g)</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Paper>
-  );
+          </TableHead>
+          <TableBody>
+            {rows.map(row => (
+              <TableRow key={row.id}>
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell align="right">{row.calories}</TableCell>
+                <TableCell align="right">{row.fat}</TableCell>
+                <TableCell align="right">{row.carbs}</TableCell>
+                <TableCell align="right">{row.protein}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Paper>
+    );
+  }
 }
 
-SimpleTable.propTypes = {
+Shifts.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  cookies: instanceOf(Cookies).isRequired,
 };
 
-export default withStyles(styles)(SimpleTable);
+Shifts = withStyles(styles)(Shifts); // eslint-disable-line no-class-assign
+export default withCookies(Shifts);
