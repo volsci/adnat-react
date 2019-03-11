@@ -157,6 +157,41 @@ class Dashboard extends React.Component {
     });
   };
 
+  handleLeaveAndJoinOrganisation = (event, organisationToJoinId) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const { cookies } = this.props;
+
+    (async () => {
+      await fetch('http://localhost:3000/organisations/leave', {
+        headers: {
+          Authorization: cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      }).then(() => {
+        (async () => {
+          await fetch('http://localhost:3000/organisations/join', {
+            headers: {
+              Authorization: cookies.get('sessionId'),
+              'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify({
+              organisationId: organisationToJoinId
+            }),
+          }).then(res => res.json())
+            .then((response) => {
+              console.log(response.name)
+            })
+            .catch(error => console.error('Error:', error));
+        })();
+        })
+        .catch(error => console.error('Error:', error));
+    })();
+  };
+
   handleSaveNewOrganisation = (event) => {
     event.preventDefault();
     const { cookies } = this.props;
@@ -260,9 +295,9 @@ class Dashboard extends React.Component {
         <Divider />
         <List>
           {
-            this.state.organisations.map(function (organisation) {
+            this.state.organisations.map( (organisation) => {
               return (
-                <ListItem key={organisation.id}>
+                <ListItem button key={organisation.id} onClick={(event) => this.handleLeaveAndJoinOrganisation(event, organisation.id)} >
                   <ListItemIcon><Work/></ListItemIcon>
                   <ListItemText primary={organisation.name} secondary={"$" + organisation.hourlyRate + " p/h"} />
                 </ListItem>
