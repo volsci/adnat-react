@@ -1,5 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { instanceOf } from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import { Redirect } from 'react-router-dom';
+import { withCookies, Cookies } from 'react-cookie';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
@@ -8,9 +11,6 @@ import Grid from '@material-ui/core/Grid/Grid';
 import CloseIcon from '@material-ui/icons/Close';
 import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import IconButton from '@material-ui/core/IconButton/IconButton';
-import withStyles from '@material-ui/core/es/styles/withStyles';
-import { Redirect } from 'react-router-dom';
-
 
 const styles = theme => ({
   root: {
@@ -18,7 +18,7 @@ const styles = theme => ({
   },
   card: {
     margin: theme.spacing.unit * 3,
-    maxWidth: 600,
+    width: 350,
     height: '100%',
   },
   control: {
@@ -53,7 +53,23 @@ class ForgotPassword extends React.Component {
     error: false,
     errorMsg: '',
     toLogIn: false,
+    authenticated: false,
+
   };
+
+  componentWillMount() {
+    const { cookies } = this.props;
+
+    if (JSON.stringify(cookies.get('sessionId')) === undefined) {
+      this.setState({
+        authenticated: false,
+      });
+    } else {
+      this.setState({
+        authenticated: true,
+      });
+    }
+  }
 
   handleEmailInput = (event) => {
     this.setState({
@@ -115,6 +131,13 @@ class ForgotPassword extends React.Component {
       return <Redirect to="/" />;
     }
 
+    /**
+     * If a session ID is detected, the user is sent to the dashboard.
+     */
+    if (this.state.authenticated === true) {
+      return <Redirect to="/dashboard" />;
+    }
+
     return (
       <Grid container className={classes.root}>
         <Grid item xs={12}>
@@ -146,7 +169,7 @@ class ForgotPassword extends React.Component {
                   </Button>
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="primary" className={classes.forgotPassword} onClick={this.handleBack}>
+                  <Button variant="contained" className={classes.forgotPassword} onClick={this.handleBack}>
                     Back
                   </Button>
                 </CardActions>
@@ -186,6 +209,8 @@ class ForgotPassword extends React.Component {
 
 ForgotPassword.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  cookies: instanceOf(Cookies).isRequired,
 };
 
-export default withStyles(styles)(ForgotPassword);
+ForgotPassword = withStyles(styles)(ForgotPassword); // eslint-disable-line no-class-assign
+export default withCookies(ForgotPassword);

@@ -64,7 +64,23 @@ class LogIn extends React.Component {
     errorMsg: '',
     toSignUp: false,
     toForgotPassword: false,
+    toDashboard: false,
+    authenticated: false,
   };
+
+  componentWillMount() {
+    const { cookies } = this.props;
+
+    if (JSON.stringify(cookies.get('sessionId')) === undefined) {
+      this.setState({
+        authenticated: false,
+      });
+    } else {
+      this.setState({
+        authenticated: true,
+      });
+    }
+  }
 
   handleEmailInput = (event) => {
     this.setState({
@@ -141,7 +157,7 @@ class LogIn extends React.Component {
       this.handleSnackBarOpen('Please provide a valid email address');
     } else {
       (async () => {
-        await fetch('http://localhost:3000/auth/forgotPassword', {
+        await fetch('http://localhost:3000/auth/login', {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
@@ -155,6 +171,9 @@ class LogIn extends React.Component {
           .then((response) => {
             if (response.error === undefined) {
               this.saveCookie(response.sessionId);
+              this.setState({
+                toDashboard: true,
+              });
             } else {
               this.handleSnackBarOpen(response.error);
             }
@@ -189,6 +208,21 @@ class LogIn extends React.Component {
      */
     if (this.state.toForgotPassword === true) {
       return <Redirect to="/forgotpass" />;
+    }
+
+    /**
+     * Using react-router, if the correct state is detected the redirect component
+     * will send the user to the dashboard.
+     */
+    if (this.state.toDashboard === true) {
+      return <Redirect to="/dashboard" />;
+    }
+
+    /**
+     * If a session ID is detected, the user is sent to the dashboard.
+     */
+    if (this.state.authenticated === true) {
+      return <Redirect to="/dashboard" />;
     }
 
     return (
@@ -248,21 +282,29 @@ class LogIn extends React.Component {
                       </FormGroup>
                     </Grid>
                     <Grid item xs={6}>
-                      <Button color="primary" className={classes.accountHandlers} onClick={this.handleForgotPassword}>
+                      <Button
+                        className={classes.accountHandlers}
+                        onClick={this.handleForgotPassword}
+                      >
                         Forgot Password
                       </Button>
                     </Grid>
                   </Grid>
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleLogin}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    className={classes.forgotPassword}
+                    onClick={this.handleLogin}
+                  >
                     Log In
                   </Button>
 
                 </CardActions>
               </Card>
-              <Button color="primary" className={classes.signUp} onClick={this.handleSignUp}>
-                {"Don't have an account yet? Sign Up'"}
+              <Button className={classes.signUp} onClick={this.handleSignUp}>
+                {"Don't have an account yet? Sign Up"}
               </Button>
             </Grid>
           </Grid>

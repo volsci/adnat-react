@@ -1784,7 +1784,7 @@ initialize {
                                       "children": Array [
                                         Object {
                                           "attribs": Object {
-                                            "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                            "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                             "tabindex": "0",
                                             "type": "button",
                                           },
@@ -1864,7 +1864,7 @@ initialize {
                                     "children": Array [
                                       Object {
                                         "attribs": Object {
-                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                           "tabindex": "0",
                                           "type": "button",
                                         },
@@ -3958,7 +3958,7 @@ initialize {
                                     "children": Array [
                                       Object {
                                         "attribs": Object {
-                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                           "tabindex": "0",
                                           "type": "button",
                                         },
@@ -4038,7 +4038,7 @@ initialize {
                                   "children": Array [
                                     Object {
                                       "attribs": Object {
-                                        "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                        "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                         "tabindex": "0",
                                         "type": "button",
                                       },
@@ -6144,7 +6144,7 @@ initialize {
                                   "children": Array [
                                     Object {
                                       "attribs": Object {
-                                        "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                        "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                         "tabindex": "0",
                                         "type": "button",
                                       },
@@ -6224,7 +6224,7 @@ initialize {
                                 "children": Array [
                                   Object {
                                     "attribs": Object {
-                                      "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                      "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                       "tabindex": "0",
                                       "type": "button",
                                     },
@@ -8914,7 +8914,7 @@ initialize {
                                     "children": Array [
                                       Object {
                                         "attribs": Object {
-                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                           "tabindex": "0",
                                           "type": "button",
                                         },
@@ -8994,7 +8994,7 @@ initialize {
                                   "children": Array [
                                     Object {
                                       "attribs": Object {
-                                        "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                        "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                         "tabindex": "0",
                                         "type": "button",
                                       },
@@ -10868,7 +10868,7 @@ initialize {
                     "namespace": "http://www.w3.org/1999/xhtml",
                     "next": Object {
                       "attribs": Object {
-                        "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-signUp-7",
+                        "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-signUp-7",
                         "tabindex": "0",
                         "type": "button",
                       },
@@ -10879,7 +10879,7 @@ initialize {
                           },
                           "children": Array [
                             Object {
-                              "data": "Don't have an account yet? Sign Up'",
+                              "data": "Don't have an account yet? Sign Up",
                               "next": null,
                               "parent": [Circular],
                               "prev": null,
@@ -10929,7 +10929,7 @@ initialize {
                   },
                   Object {
                     "attribs": Object {
-                      "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-signUp-7",
+                      "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-signUp-7",
                       "tabindex": "0",
                       "type": "button",
                     },
@@ -10940,7 +10940,7 @@ initialize {
                         },
                         "children": Array [
                           Object {
-                            "data": "Don't have an account yet? Sign Up'",
+                            "data": "Don't have an account yet? Sign Up",
                             "next": null,
                             "parent": [Circular],
                             "prev": null,
@@ -12727,7 +12727,7 @@ initialize {
                                         "children": Array [
                                           Object {
                                             "attribs": Object {
-                                              "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                              "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                               "tabindex": "0",
                                               "type": "button",
                                             },
@@ -12807,7 +12807,7 @@ initialize {
                                       "children": Array [
                                         Object {
                                           "attribs": Object {
-                                            "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                            "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                             "tabindex": "0",
                                             "type": "button",
                                           },
@@ -14901,7 +14901,7 @@ initialize {
                                       "children": Array [
                                         Object {
                                           "attribs": Object {
-                                            "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                            "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                             "tabindex": "0",
                                             "type": "button",
                                           },
@@ -14981,7 +14981,7 @@ initialize {
                                     "children": Array [
                                       Object {
                                         "attribs": Object {
-                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                           "tabindex": "0",
                                           "type": "button",
                                         },
@@ -17087,7 +17087,7 @@ initialize {
                                     "children": Array [
                                       Object {
                                         "attribs": Object {
-                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                           "tabindex": "0",
                                           "type": "button",
                                         },
@@ -17167,7 +17167,7 @@ initialize {
                                   "children": Array [
                                     Object {
                                       "attribs": Object {
-                                        "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                        "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                         "tabindex": "0",
                                         "type": "button",
                                       },
@@ -19857,7 +19857,7 @@ initialize {
                                       "children": Array [
                                         Object {
                                           "attribs": Object {
-                                            "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                            "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                             "tabindex": "0",
                                             "type": "button",
                                           },
@@ -19937,7 +19937,7 @@ initialize {
                                     "children": Array [
                                       Object {
                                         "attribs": Object {
-                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-textPrimary-260 MuiButton-flat-262 MuiButton-flatPrimary-263 LogIn-accountHandlers-8",
+                                          "class": "MuiButtonBase-root-218 MuiButton-root-257 MuiButton-text-259 MuiButton-flat-262 LogIn-accountHandlers-8",
                                           "tabindex": "0",
                                           "type": "button",
                                         },

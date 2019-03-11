@@ -1,6 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { instanceOf } from 'prop-types';
 import { Redirect } from 'react-router-dom';
+import { withCookies, Cookies } from 'react-cookie';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
@@ -17,7 +18,7 @@ const styles = theme => ({
   },
   card: {
     margin: theme.spacing.unit * 3,
-    maxWidth: 600,
+    width: 350,
     height: '100%',
   },
   control: {
@@ -55,8 +56,22 @@ class SignUp extends React.Component {
     passwordConfirmation: '',
     error: false,
     errorMsg: '',
-    toLogIn: false,
+    authenticated: false,
   };
+
+  componentWillMount() {
+    const { cookies } = this.props;
+
+    if (JSON.stringify(cookies.get('sessionId')) === undefined) {
+      this.setState({
+        authenticated: false,
+      });
+    } else {
+      this.setState({
+        authenticated: true,
+      });
+    }
+  }
 
   handleNameInput = (event) => {
     this.setState({
@@ -97,6 +112,15 @@ class SignUp extends React.Component {
   };
 
   /**
+   * When a user is successfully authenticated, they receive a session ID. This
+   * session ID is saved as a cookie, using react-cookie.
+   */
+  saveCookie = (sessionId) => {
+    const { cookies } = this.props;
+    cookies.set('sessionId', sessionId, { path: '/' });
+  };
+
+  /**
    * The input is validated and discarded if it does not pass some basic checks.
    * Valid input is composed into a POST request sent to the db, which will
    * create a new user entry.
@@ -111,6 +135,8 @@ class SignUp extends React.Component {
       this.handleSnackBarOpen('Please provide all of the required details');
     } else if (!this.state.email.includes('@')) {
       this.handleSnackBarOpen('Please provide a valid email address');
+    } else if (this.state.password.length < 6) {
+      this.handleSnackBarOpen('Please enter a password with six characters or more');
     } else {
       (async () => {
         await fetch('http://localhost:3000/auth/signUp', {
@@ -129,9 +155,10 @@ class SignUp extends React.Component {
           .then((response) => {
             if (response.error === undefined) {
               this.handleSnackBarOpen('Success! Account created, please log in with your provided details');
+              this.saveCookie(response.sessionId);
 
               this.setState({
-                toLogIn: true,
+                authenticated: true,
               });
             } else {
               this.handleSnackBarOpen(response.error);
@@ -161,6 +188,13 @@ class SignUp extends React.Component {
       return <Redirect to="/" />;
     }
 
+    /**
+     * If a session ID is detected, the user is sent to the dashboard.
+     */
+    if (this.state.authenticated === true) {
+      return <Redirect to="/dashboard" />;
+    }
+
     return (
       <Grid container className={classes.root}>
         <Grid item xs={12}>
@@ -182,6 +216,7 @@ class SignUp extends React.Component {
                     variant="outlined"
                     value={this.state.name}
                     onChange={this.handleNameInput}
+                    fullWidth
                   />
                 </CardActions>
                 <CardActions>
@@ -195,6 +230,7 @@ class SignUp extends React.Component {
                     variant="outlined"
                     value={this.state.email}
                     onChange={this.handleEmailInput}
+                    fullWidth
                   />
                 </CardActions>
                 <CardActions>
@@ -207,6 +243,7 @@ class SignUp extends React.Component {
                     variant="outlined"
                     value={this.state.password}
                     onChange={this.handlePasswordInput}
+                    fullWidth
                   />
                 </CardActions>
                 <CardActions>
@@ -219,15 +256,16 @@ class SignUp extends React.Component {
                     variant="outlined"
                     value={this.state.passwordConfirmation}
                     onChange={this.handlePasswordConfirmationInput}
+                    fullWidth
                   />
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleSignUp}>
+                  <Button variant="contained" color="secondary" className={classes.forgotPassword} fullWidth onClick={this.handleSignUp}>
                     Sign Up
                   </Button>
                 </CardActions>
                 <CardActions disableActionSpacing>
-                  <Button variant="contained" color="primary" className={classes.forgotPassword} onClick={this.handleBack}>
+                  <Button variant="contained" className={classes.forgotPassword} fullWidth onClick={this.handleBack}>
                     Back
                   </Button>
                 </CardActions>
@@ -267,6 +305,8 @@ class SignUp extends React.Component {
 
 SignUp.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  cookies: instanceOf(Cookies).isRequired,
 };
 
-export default withStyles(styles)(SignUp);
+SignUp = withStyles(styles)(SignUp); // eslint-disable-line no-class-assign
+export default withCookies(SignUp);
