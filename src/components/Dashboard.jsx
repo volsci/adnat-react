@@ -4,12 +4,14 @@ import { Cookies, withCookies } from 'react-cookie';
 import { Redirect } from 'react-router-dom';
 import { withStyles } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
+import Drawer from '@material-ui/core/Drawer';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Shifts from './Shifts';
+import Divider from "@material-ui/core/Divider";
 
 
 const styles = theme => ({
@@ -23,12 +25,19 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
   },
+  list: {
+    width: 300,
+  },
+  fullList: {
+    width: 'auto',
+  },
 });
 
 class Dashboard extends React.Component {
   state = {
     toAccount: false,
     authenticated: false,
+    drawerOpen: false
   };
 
   componentWillMount() {
@@ -53,6 +62,15 @@ class Dashboard extends React.Component {
     });
   };
 
+  handleDrawer = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      drawerOpen: !this.state.drawerOpen,
+    });
+  };
+
+
   render() {
     const { classes } = this.props;
 
@@ -71,11 +89,23 @@ class Dashboard extends React.Component {
       return <Redirect to="/" />;
     }
 
+    const drawerContents = (
+      <div className={classes.list}>
+        <Typography variant="h6" color="inherit" className={classes.grow}>
+          Dashboard
+        </Typography>
+        <Divider />
+        <Typography variant="h6" color="inherit" className={classes.grow}>
+          Dashboard
+        </Typography>
+      </div>
+    );
+
     return (
       <div className={classes.root}>
         <AppBar position="static">
           <Toolbar>
-            <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
+            <IconButton className={classes.menuButton} color="inherit" aria-label="Menu" onClick={this.handleDrawer}>
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" color="inherit" className={classes.grow}>
@@ -86,6 +116,16 @@ class Dashboard extends React.Component {
             </IconButton>
           </Toolbar>
         </AppBar>
+        <Drawer open={this.state.drawerOpen} onClose={this.handleDrawer}>
+          <div
+            tabIndex={0}
+            role="button"
+            onClick={this.handleDrawer}
+            onKeyDown={this.handleDrawer}
+          >
+            {drawerContents}
+          </div>
+        </Drawer>
         <Shifts/>
       </div>
     );
