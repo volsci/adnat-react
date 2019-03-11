@@ -20,7 +20,7 @@ import CardActions from '@material-ui/core/CardActions';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField/TextField';
 import Snackbar from "@material-ui/core/Snackbar/Snackbar";
-import CloseIcon from "@material-ui/core/SvgIcon/SvgIcon";
+import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
   root: {
@@ -51,6 +51,17 @@ const styles = theme => ({
     width: '100%',
     height: 50,
   },
+  passwordCardAction: {
+    margin: theme.spacing.unit,
+    maxWidth: 385,
+    width: '100%',
+    height: 50,
+  },
+  passwordButton: {
+    margin: theme.spacing.unit,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
   button: {
     flexGrow: 1,
     width: '100%'
@@ -68,6 +79,9 @@ class Account extends React.Component {
     editPassword: '',
     editedName: '',
     editedEmail: '',
+    oldPassword: '',
+    editedPassword: '',
+    editedPasswordConfirmation: '',
     error: false,
     errorMsg: ''
   };
@@ -163,6 +177,30 @@ class Account extends React.Component {
     })
   };
 
+  handleOldPasswordInput = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      oldPassword: event.target.value,
+    });
+  };
+
+  handlePasswordChange = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      editedPassword: event.target.value,
+    });
+  };
+
+  handlePasswordChangeConfirmation = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      editedPasswordConfirmation: event.target.value,
+    });
+  };
+
   handleUpdateName = (event) => {
     event.preventDefault();
     const { cookies } = this.props;
@@ -187,6 +225,7 @@ class Account extends React.Component {
                 name: this.state.editedName,
                 editName: false
               });
+              this.handleSnackBarOpen('Name Updated Successfully');
             } else {
               console.log(response.error);
             }
@@ -222,8 +261,50 @@ class Account extends React.Component {
                 email: this.state.editedEmail,
                 editEmail: false
               });
+              this.handleSnackBarOpen('Email Updated Successfully');
             } else {
               console.log(response.error);
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      })();
+    }
+  };
+
+  handleUpdatePassword = (event) => {
+    event.preventDefault();
+    const { cookies } = this.props;
+
+    if (this.state.editedPassword === ''
+      || this.state.editedPasswordConfirmation === ''
+      || this.state.oldPassword === '') {
+      this.handleSnackBarOpen('Please enter all required password information');
+    } else if (this.state.editedPassword.length < 6) {
+      this.handleSnackBarOpen('Please enter a password with six characters or more');
+    } else {
+      (async () => {
+        await fetch('http://localhost:3000/users/me/change_password', {
+          headers: {
+            "Authorization": cookies.get('sessionId'),
+            'Content-Type': 'application/json',
+          },
+          method: 'PUT',
+          body: JSON.stringify({
+            oldPassword: this.state.oldPassword,
+            newPassword: this.state.editedPassword,
+            newPasswordConfirmation: this.state.editedPasswordConfirmation
+          }),
+        }).then((response) => {
+            if (response.error === undefined) {
+              this.setState({
+                editPassword: false,
+                oldPassword: '',
+                editedPassword: '',
+                editedPasswordConfirmation: '',
+              });
+              this.handleSnackBarOpen('Password Updated Successfully');
+            } else {
+              this.handleSnackBarOpen(response.error);
             }
           })
           .catch(error => console.error('Error:', error));
@@ -355,11 +436,50 @@ class Account extends React.Component {
     }
 
     if (this.state.editPassword === true) {
-      passwordField =   <CardActions disableActionSpacing className={classes.cardAction}>
-                      <Button color="inherit" onClick={this.handleLogout}>
-                        Logout
-                      </Button>
-                    </CardActions>
+      passwordField =   <Grid item>
+                          <CardActions disableActionSpacing className={classes.passwordCardAction}>
+                            <TextField
+                              id="outlined-oldPassword-input"
+                              label="Old Password"
+                              type="password"
+                              margin="normal"
+                              value={this.state.oldPassword}
+                              onChange={this.handleOldPasswordInput}
+                              fullWidth
+                            />
+                          </CardActions>
+                          <CardActions disableActionSpacing className={classes.passwordCardAction}>
+                            <TextField
+                              id="outlined-newPassword-input"
+                              label="New Password"
+                              type="password"
+                              margin="normal"
+                              value={this.state.editedPassword}
+                              onChange={this.handlePasswordChange}
+                              fullWidth
+                            />
+                          </CardActions>
+                          <CardActions disableActionSpacing className={classes.passwordCardAction}>
+                            <TextField
+                              id="outlined-passwordConfirmation-input"
+                              label="Confirm Password"
+                              type="password"
+                              margin="normal"
+                              value={this.state.editedPasswordConfirmation}
+                              onChange={this.handlePasswordChangeConfirmation}
+                              fullWidth
+                            />
+                        </CardActions>
+        <CardActions disableActionSpacing>
+                        <IconButton className={classes.passwordButton} aria-label="Menu" onClick={this.handleUpdatePassword}>
+                          <Save />
+                        </IconButton>
+                        <IconButton className={classes.passwordButton} aria-label="Menu" onClick={this.handleEditPassword}>
+                          <Cancel />
+                        </IconButton>
+        </CardActions>
+      </Grid>
+
     } else {
       passwordField =   <CardActions disableActionSpacing>
                       <Button variant="contained" color="secondary" fullWidth onClick={this.handleEditPassword}>
