@@ -8,11 +8,22 @@ import Drawer from '@material-ui/core/Drawer';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import Save from '@material-ui/icons/Save';
+import AddCircle from '@material-ui/icons/AddCircle';
+import Cancel from '@material-ui/icons/Cancel';
 import MenuIcon from '@material-ui/icons/Menu';
+import Work from '@material-ui/icons/Work';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Divider from '@material-ui/core/Divider';
 import Shifts from './Shifts';
-
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import TextField from "@material-ui/core/TextField/TextField";
+import Paper from "@material-ui/core/Paper";
+import Snackbar from "@material-ui/core/Snackbar/Snackbar";
+import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
   root: {
@@ -31,6 +42,9 @@ const styles = theme => ({
   fullList: {
     width: 'auto',
   },
+  paper: {
+    margin: theme.spacing.unit,
+  },
 });
 
 class Dashboard extends React.Component {
@@ -38,6 +52,12 @@ class Dashboard extends React.Component {
     toAccount: false,
     authenticated: false,
     drawerOpen: false,
+    createNewOrganisation: false,
+    newOrganisationName: '',
+    newOrganisationHourly: 0,
+    error: false,
+    errorMsg: '',
+    organisations: []
   };
 
   componentWillMount() {
@@ -54,8 +74,37 @@ class Dashboard extends React.Component {
     }
   }
 
+  componentDidMount() {
+    const { cookies } = this.props;
+
+    if (this.state.authenticated === true) {
+      (async () => {
+        await fetch('http://localhost:3000/organisations', {
+          headers: {
+            Authorization: cookies.get('sessionId'),
+            'Content-Type': 'application/json',
+          },
+          method: 'GET',
+        }).then(res => res.json())
+          .then((response) => {
+            if (response.error === undefined) {
+              this.setState({
+                organisations: response
+              });
+              console.log(this.state.organisations);
+            } else {
+              console.log(response.error);
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      })();
+    }
+  }
+
   handleAccountButton = (event) => {
     event.preventDefault();
+    const { cookies } = this.props;
+
 
     this.setState({
       toAccount: true,
@@ -70,9 +119,86 @@ class Dashboard extends React.Component {
     });
   };
 
+  handleCreateNewOrganisation = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      createNewOrganisation: !this.state.createNewOrganisation,
+    });
+  };
+
+  handleNewOrganisationNameChange = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      newOrganisationName: event.target.value,
+    });
+  };
+
+  handleNewOrganisationHourlyChange = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      newOrganisationHourly: event.target.value,
+    });
+  };
+
+  handleSnackBarOpen = (errorMsg) => {
+    this.setState({
+      error: true,
+      errorMsg,
+    });
+  };
+
+  handleSnackBarClose = () => {
+    this.setState({
+      error: false,
+      errorMsg: '',
+    });
+  };
+
+  handleSaveNewOrganisation = (event) => {
+    event.preventDefault();
+    const { cookies } = this.props;
+
+    if (this.state.newOrganisationName === '') {
+      this.handleSnackBarOpen('Please provide a name');
+    } else if (this.state.newOrganisationHourly === isNaN) {
+      this.handleSnackBarOpen('Hourly rate must be a number');
+    } else {
+        (async () => {
+          await fetch('http://localhost:3000/organisations/create_join', {
+            headers: {
+              Authorization: cookies.get('sessionId'),
+              'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify({
+              name: this.state.newOrganisationName,
+              hourlyRate: this.state.newOrganisationHourly,
+            }),
+          }).then(res => res.json())
+            .then((response) => {
+              if (response.error === undefined) {
+                this.setState({
+                  newOrganisationName: '',
+                  newOrganisationHourly: 0,
+                  createNewOrganisation: false
+                });
+                this.componentDidMount();
+              } else {
+                this.handleSnackBarOpen(response.error);
+              }
+            })
+            .catch(error => console.error('Error:', error));
+        })();
+    }
+  };
 
   render() {
     const { classes } = this.props;
+
+    let createOrganisation;
 
     /**
      * Using react-router, if the correct state is detected the redirect component
@@ -89,15 +215,63 @@ class Dashboard extends React.Component {
       return <Redirect to="/" />;
     }
 
+    if (this.state.createNewOrganisation === true) {
+      createOrganisation = (
+        <Paper className={classes.paper}>
+          <TextField
+            className={classes.input}
+            id="outlined-name"
+            label="Organisation Name"
+            margin="normal"
+            onChange={this.handleNewOrganisationNameChange}
+            fullWidth
+          />
+          <TextField
+            className={classes.input}
+            id="outlined-rate"
+            label="Hourly Rate"
+            margin="normal"
+            onChange={this.handleNewOrganisationHourlyChange}
+            fullWidth
+          />
+          <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleSaveNewOrganisation}>
+            <Save />
+          </IconButton>
+          <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleCreateNewOrganisation}>
+            <Cancel />
+          </IconButton>
+        </Paper>
+      );
+    } else {
+      createOrganisation = (
+        <div>
+          <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleCreateNewOrganisation}>
+            <AddCircle />
+          </IconButton>
+        </div>
+      );
+    }
+
     const drawerContents = (
       <div className={classes.list}>
         <Typography variant="h6" color="inherit" className={classes.grow}>
-          Dashboard
+          Organisations
         </Typography>
         <Divider />
-        <Typography variant="h6" color="inherit" className={classes.grow}>
-          Dashboard
-        </Typography>
+        <List>
+          {
+            this.state.organisations.map(function (organisation) {
+              return (
+                <ListItem key={organisation.id}>
+                  <ListItemIcon><Work/></ListItemIcon>
+                  <ListItemText primary={organisation.name} secondary={"$" + organisation.hourlyRate + " p/h"} />
+                </ListItem>
+              );
+            })
+          }
+        </List>
+        <Divider />
+        {createOrganisation}
       </div>
     );
 
@@ -120,13 +294,37 @@ class Dashboard extends React.Component {
           <div
             tabIndex={0}
             role="button"
-            onClick={this.handleDrawer}
-            onKeyDown={this.handleDrawer}
+            //onKeyDown={this.handleDrawer}
           >
             {drawerContents}
           </div>
         </Drawer>
         <Shifts />
+
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={this.state.error}
+          autoHideDuration={3000}
+          onClose={this.handleSnackBarClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">{this.state.errorMsg}</span>}
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              className={classes.close}
+              onClick={this.handleSnackBarClose}
+            >
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
       </div>
     );
   }
