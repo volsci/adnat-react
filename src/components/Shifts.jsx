@@ -143,10 +143,12 @@ class Shifts extends React.Component {
   calculateTimeWorked(shift) {
     const start = new Date(this.state.shifts[shift].start);
     const finish = new Date(this.state.shifts[shift].finish);
+    const breakLength = parseInt(this.state.shifts[shift].breakLength, 10);
 
     const diff = Math.abs(finish - start);
-    const hours = Math.floor((diff / 1000) / 60 / 60);
-    const minutes = Math.floor((diff / 1000) / 60) % 60;
+    const totalMinutes = (Math.floor((diff / 1000) / 60)) - breakLength;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = Math.floor(totalMinutes % 60);
     this.state.shifts[shift].timeWorked = (`${hours} hours, ${minutes} minutes`);
   }
 
