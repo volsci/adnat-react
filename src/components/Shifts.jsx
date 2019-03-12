@@ -26,37 +26,12 @@ class Shifts extends React.Component {
     shifts: [],
     // rows: [],
     currentUserId: 0,
-    currentOrganisationMemberIds: [],
+    currentOrganisationMembers: [],
   };
 
   componentDidMount() {
-    this.getCurrentUserId();
     this.getCurrentOrganisationUsers();
     this.getShifts();
-  }
-
-  getCurrentUserId() {
-    const { cookies } = this.props;
-
-    (async () => {
-      await fetch('http://localhost:3000/users/me', {
-        headers: {
-          Authorization: cookies.get('sessionId'),
-          'Content-Type': 'application/json',
-        },
-        method: 'GET',
-      }).then(res => res.json())
-        .then((response) => {
-          if (response.error === undefined) {
-            this.setState({
-              currentUserId: response.id,
-            });
-          } else {
-            console.log(response.error);
-          }
-        })
-        .catch(error => console.error('Error:', error));
-    })();
   }
 
   getCurrentOrganisationUsers() {
@@ -73,7 +48,7 @@ class Shifts extends React.Component {
         .then((response) => {
           if (response.error === undefined) {
             for (let i = 0; i < response.length; i += 1) {
-              this.state.currentOrganisationMemberIds.push(response[i].id);
+              this.state.currentOrganisationMembers.push(response[i]);
             }
           } else {
             console.log(response.error);
@@ -96,10 +71,10 @@ class Shifts extends React.Component {
       }).then(res => res.json())
         .then((response) => {
           if (response.error === undefined) {
-            console.log(response);
             for (let i = 0; i < response.length; i += 1) {
               this.state.shifts.push(response[i]);
             }
+            this.matchNames();
             console.log(this.state.shifts);
           } else {
             console.log(response.error);
@@ -131,6 +106,16 @@ class Shifts extends React.Component {
       }).catch(error => console.error('Error:', error));
     })();
   };
+
+  matchNames() {
+    for (let i = 0; i < this.state.shifts.length; i += 1) {
+      for (let j = 0; j < this.state.currentOrganisationMembers.length; j += 1) {
+        if (this.state.shifts[i].userId === this.state.currentOrganisationMembers[j].id) {
+          this.state.shifts[i].name = this.state.currentOrganisationMembers[j].name;
+        }
+      }
+    }
+  }
 
   render() {
     const { classes } = this.props;
