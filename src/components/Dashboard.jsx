@@ -15,15 +15,15 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Work from '@material-ui/icons/Work';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import Divider from '@material-ui/core/Divider';
-import Shifts from './Shifts';
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import TextField from "@material-ui/core/TextField/TextField";
-import Paper from "@material-ui/core/Paper";
-import Snackbar from "@material-ui/core/Snackbar/Snackbar";
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import TextField from '@material-ui/core/TextField/TextField';
+import Paper from '@material-ui/core/Paper';
+import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import CloseIcon from '@material-ui/icons/Close';
+import Shifts from './Shifts';
 
 const styles = theme => ({
   root: {
@@ -58,7 +58,7 @@ class Dashboard extends React.Component {
     currentOrganisationId: 0,
     error: false,
     errorMsg: '',
-    organisations: []
+    organisations: [],
   };
 
   componentWillMount() {
@@ -76,29 +76,58 @@ class Dashboard extends React.Component {
   }
 
   componentDidMount() {
+    if (this.state.authenticated === true) {
+      this.getCurrentOrganisationId();
+      this.getOrganisations();
+    }
+  }
+
+  getOrganisations() {
     const { cookies } = this.props;
 
-    if (this.state.authenticated === true) {
-      (async () => {
-        await fetch('http://localhost:3000/organisations', {
-          headers: {
-            Authorization: cookies.get('sessionId'),
-            'Content-Type': 'application/json',
-          },
-          method: 'GET',
-        }).then(res => res.json())
-          .then((response) => {
-            if (response.error === undefined) {
-              this.setState({
-                organisations: response
-              });
-            } else {
-              console.log(response.error);
-            }
-          })
-          .catch(error => console.error('Error:', error));
-      })();
-    }
+    (async () => {
+      await fetch('http://localhost:3000/organisations', {
+        headers: {
+          Authorization: cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      }).then(res => res.json())
+        .then((response) => {
+          if (response.error === undefined) {
+            this.setState({
+              organisations: response,
+            });
+          } else {
+            console.log(response.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    })();
+  }
+
+  getCurrentOrganisationId() {
+    const { cookies } = this.props;
+
+    (async () => {
+      await fetch('http://localhost:3000/users/me', {
+        headers: {
+          Authorization: cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      }).then(res => res.json())
+        .then((response) => {
+          if (response.error === undefined) {
+            this.setState({
+              currentOrganisationId: response.organisationId,
+            });
+          } else {
+            console.log(response.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    })();
   }
 
   handleAccountButton = (event) => {
@@ -161,35 +190,29 @@ class Dashboard extends React.Component {
 
     const { cookies } = this.props;
 
-    (async () => {
-      await fetch('http://localhost:3000/organisations/leave', {
-        headers: {
-          Authorization: cookies.get('sessionId'),
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-      }).then(() => {
-        (async () => {
-          await fetch('http://localhost:3000/organisations/join', {
-            headers: {
-              Authorization: cookies.get('sessionId'),
-              'Content-Type': 'application/json',
-            },
-            method: 'POST',
-            body: JSON.stringify({
-              organisationId: organisationToJoinId
-            }),
-          }).then(res => res.json())
-            .then((response) => {
-              this.setState({
-                currentOrganisationId: response.id
-              });
-            })
-            .catch(error => console.error('Error:', error));
-        })();
-        })
-        .catch(error => console.error('Error:', error));
-    })();
+    if (this.state.currentOrganisationId === null) {
+      (async () => {
+        await fetch('http://localhost:3000/organisations/join', {
+          headers: {
+            Authorization: cookies.get('sessionId'),
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+          body: JSON.stringify({
+            organisationId: organisationToJoinId,
+          }),
+        }).then(res => res.json())
+          .then((response) => {
+            this.setState({
+              currentOrganisationId: response.id,
+            });
+            this.componentDidMount();
+            this.handleDrawer(event);
+            this.handleSnackBarOpen(`Joined ${response.name}`);
+          })
+          .catch(error => console.error('Error:', error));
+      })();
+    }
   };
 
   handleSaveNewOrganisation = (event) => {
@@ -198,35 +221,35 @@ class Dashboard extends React.Component {
 
     if (this.state.newOrganisationName === '') {
       this.handleSnackBarOpen('Please provide a name');
-    } else if (this.state.newOrganisationHourly === isNaN) {
+    } else if (Number.isNaN(parseInt(this.state.newOrganisationHourly, 10)) === true) {
       this.handleSnackBarOpen('Hourly rate must be a number');
     } else {
-        (async () => {
-          await fetch('http://localhost:3000/organisations/create_join', {
-            headers: {
-              Authorization: cookies.get('sessionId'),
-              'Content-Type': 'application/json',
-            },
-            method: 'POST',
-            body: JSON.stringify({
-              name: this.state.newOrganisationName,
-              hourlyRate: this.state.newOrganisationHourly,
-            }),
-          }).then(res => res.json())
-            .then((response) => {
-              if (response.error === undefined) {
-                this.setState({
-                  newOrganisationName: '',
-                  newOrganisationHourly: 0,
-                  createNewOrganisation: false
-                });
-                this.componentDidMount();
-              } else {
-                this.handleSnackBarOpen(response.error);
-              }
-            })
-            .catch(error => console.error('Error:', error));
-        })();
+      (async () => {
+        await fetch('http://localhost:3000/organisations/create_join', {
+          headers: {
+            Authorization: cookies.get('sessionId'),
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+          body: JSON.stringify({
+            name: this.state.newOrganisationName,
+            hourlyRate: this.state.newOrganisationHourly,
+          }),
+        }).then(res => res.json())
+          .then((response) => {
+            if (response.error === undefined) {
+              this.setState({
+                newOrganisationName: '',
+                newOrganisationHourly: 0,
+                createNewOrganisation: false,
+              });
+              this.componentDidMount();
+            } else {
+              this.handleSnackBarOpen(response.error);
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      })();
     }
   };
 
@@ -234,6 +257,7 @@ class Dashboard extends React.Component {
     const { classes } = this.props;
 
     let createOrganisation;
+    let listItems;
 
     /**
      * Using react-router, if the correct state is detected the redirect component
@@ -250,7 +274,9 @@ class Dashboard extends React.Component {
       return <Redirect to="/" />;
     }
 
-    if (this.state.createNewOrganisation === true) {
+    if (this.state.currentOrganisationId > 0) {
+      createOrganisation = <div />;
+    } else if (this.state.createNewOrganisation === true) {
       createOrganisation = (
         <Paper className={classes.paper}>
           <TextField
@@ -287,24 +313,51 @@ class Dashboard extends React.Component {
       );
     }
 
+    if (this.state.currentOrganisationId > 0) {
+      listItems = (
+        <List>
+          {
+                      this.state.organisations.map(organisation => (
+                        <ListItem
+                          selected={organisation.id === this.state.currentOrganisationId}
+                          key={organisation.id}
+                        >
+                          <ListItemIcon><Work /></ListItemIcon>
+                          <ListItemText primary={organisation.name} secondary={`$${organisation.hourlyRate} p/h`} />
+                        </ListItem>
+                      ))
+                    }
+        </List>
+      );
+    } else {
+      listItems = (
+        <List>
+          {
+                      this.state.organisations.map(organisation => (
+                        <ListItem
+                          button
+                          selected={organisation.id
+                          === this.state.currentOrganisationId}
+                          key={organisation.id}
+                          onClick={event => this.handleLeaveAndJoinOrganisation(event,
+                            organisation.id)}
+                        >
+                          <ListItemIcon><Work /></ListItemIcon>
+                          <ListItemText primary={organisation.name} secondary={`$${organisation.hourlyRate} p/h`} />
+                        </ListItem>
+                      ))
+                    }
+        </List>
+      );
+    }
+
     const drawerContents = (
       <div className={classes.list}>
         <Typography variant="h6" color="inherit" className={classes.grow}>
           Organisations
         </Typography>
         <Divider />
-        <List>
-          {
-            this.state.organisations.map( (organisation) => {
-              return (
-                <ListItem button key={organisation.id} onClick={(event) => this.handleLeaveAndJoinOrganisation(event, organisation.id)} >
-                  <ListItemIcon><Work/></ListItemIcon>
-                  <ListItemText primary={organisation.name} secondary={"$" + organisation.hourlyRate + " p/h"} />
-                </ListItem>
-              );
-            })
-          }
-        </List>
+        {listItems}
         <Divider />
         {createOrganisation}
       </div>
@@ -329,12 +382,12 @@ class Dashboard extends React.Component {
           <div
             tabIndex={0}
             role="button"
-            //onKeyDown={this.handleDrawer}
+            // onKeyDown={this.handleDrawer}
           >
             {drawerContents}
           </div>
         </Drawer>
-        <Shifts organisationId={this.state.organisationId}/>
+        <Shifts />
 
         <Snackbar
           anchorOrigin={{

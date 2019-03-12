@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes, { instanceOf } from "prop-types";
+import PropTypes, { instanceOf } from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Cookies, withCookies } from 'react-cookie';
 import Table from '@material-ui/core/Table';
@@ -8,6 +8,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button/Button';
 
 const styles = theme => ({
   root: {
@@ -20,84 +21,163 @@ const styles = theme => ({
   },
 });
 
-let id = 0;
-function createData(name, calories, fat, carbs, protein) {
-  id += 1;
-  return {
-    id, name, calories, fat, carbs, protein,
-  };
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-
-
 class Shifts extends React.Component {
+  state = {
+    shifts: [],
+    // rows: [],
+    currentUserId: 0,
+    currentOrganisationMemberIds: [],
+  };
 
   componentDidMount() {
-    const { cookies } = this.props;
-    const { organisationId } = this.props;
-
-    (async () => {
-        await fetch('http://localhost:3000/shifts', {
-          headers: {
-            Authorization: cookies.get('sessionId'),
-            'Content-Type': 'application/json',
-          },
-          method: 'GET',
-        }).then(res => res.json())
-          .then((response) => {
-            if (response.error === undefined) {
-              console.log('works')
-              for (let i = 0; i < response.length; i++) {
-                if (response.id === organisationId) {
-                  console.log(response[i]);
-                }
-              }
-            } else {
-              console.log(response.error);
-            }
-          })
-          .catch(error => console.error('Error:', error));
-      })();
+    this.getCurrentUserId();
+    this.getCurrentOrganisationUsers();
+    this.getShifts();
   }
 
+  getCurrentUserId() {
+    const { cookies } = this.props;
+
+    (async () => {
+      await fetch('http://localhost:3000/users/me', {
+        headers: {
+          Authorization: cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      }).then(res => res.json())
+        .then((response) => {
+          if (response.error === undefined) {
+            this.setState({
+              currentUserId: response.id,
+            });
+          } else {
+            console.log(response.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    })();
+  }
+
+  getCurrentOrganisationUsers() {
+    const { cookies } = this.props;
+
+    (async () => {
+      await fetch('http://localhost:3000/users', {
+        headers: {
+          Authorization: cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      }).then(res => res.json())
+        .then((response) => {
+          if (response.error === undefined) {
+            for (let i = 0; i < response.length; i += 1) {
+              this.state.currentOrganisationMemberIds.push(response[i].id);
+            }
+          } else {
+            console.log(response.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    })();
+  }
+
+  getShifts() {
+    const { cookies } = this.props;
+
+    (async () => {
+      await fetch('http://localhost:3000/shifts', {
+        headers: {
+          Authorization: cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      }).then(res => res.json())
+        .then((response) => {
+          if (response.error === undefined) {
+            console.log(response);
+            for (let i = 0; i < response.length; i += 1) {
+              this.state.shifts.push(response[i]);
+            }
+            console.log(this.state.shifts);
+          } else {
+            console.log(response.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    })();
+  }
+
+  handleCreateNewShift = (event) => {
+    event.preventDefault();
+    const { cookies } = this.props;
+
+    (async () => {
+      await fetch('http://localhost:3000/shifts', {
+        headers: {
+          Authorization: cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          userId: this.state.currentUserId,
+          start: '2018-01-03 10:15',
+          finish: '2018-01-03 12:20',
+          breakLength: 30,
+        }),
+      }).then(() => {
+        this.getShifts();
+      }).catch(error => console.error('Error:', error));
+    })();
+  };
 
   render() {
     const { classes } = this.props;
 
-    return (
-      <Paper className={classes.root}>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Dessert (100g serving)</TableCell>
-              <TableCell align="right">Calories</TableCell>
-              <TableCell align="right">Fat (g)</TableCell>
-              <TableCell align="right">Carbs (g)</TableCell>
-              <TableCell align="right">Protein (g)</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map(row => (
-              <TableRow key={row.id}>
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                <TableCell align="right">{row.calories}</TableCell>
-                <TableCell align="right">{row.fat}</TableCell>
-                <TableCell align="right">{row.carbs}</TableCell>
-                <TableCell align="right">{row.protein}</TableCell>
+    let shiftTable;
+
+    if (this.state.shifts.length === 0) {
+      shiftTable = (
+        <div>Join or Create New Organisation From the Menu</div>
+      );
+    } else {
+      shiftTable = (
+        <Paper className={classes.root}>
+          <Table className={classes.table}>
+            <TableHead>
+              <TableRow>
+                <TableCell align="left">Employee Name</TableCell>
+                <TableCell align="right">Shift Start</TableCell>
+                <TableCell align="right">Shift Finish</TableCell>
+                <TableCell align="right">Break Length</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
+            </TableHead>
+            <TableBody>
+              {this.state.shifts.map(row => (
+                <TableRow key={row.id}>
+                  <TableCell component="th" scope="row">
+                    {row.userId}
+                  </TableCell>
+                  <TableCell align="right">{row.start}</TableCell>
+                  <TableCell align="right">{row.finish}</TableCell>
+                  <TableCell align="right">{row.breakLength}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+
+      );
+    }
+
+    return (
+      <div>
+        {shiftTable}
+        <Button onClick={this.handleCreateNewShift}>
+          {'Create a New Shift'}
+        </Button>
+      </div>
     );
   }
 }
