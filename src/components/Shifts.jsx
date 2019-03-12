@@ -24,14 +24,38 @@ const styles = theme => ({
 class Shifts extends React.Component {
   state = {
     shifts: [],
-    // rows: [],
     currentUserId: 0,
     currentOrganisationMembers: [],
   };
 
   componentDidMount() {
     this.getCurrentOrganisationUsers();
+    this.getCurrentUserId();
     this.getShifts();
+  }
+
+  getCurrentUserId() {
+    const { cookies } = this.props;
+
+    (async () => {
+      await fetch('http://localhost:3000/users/me', {
+        headers: {
+          Authorization: cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      }).then(res => res.json())
+        .then((response) => {
+          if (response.error === undefined) {
+            this.setState({
+              currentUserId: response.id,
+            });
+          } else {
+            console.log(response.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    })();
   }
 
   getCurrentOrganisationUsers() {
@@ -73,9 +97,10 @@ class Shifts extends React.Component {
           if (response.error === undefined) {
             for (let i = 0; i < response.length; i += 1) {
               this.state.shifts.push(response[i]);
+              this.matchNames([i]);
+              this.calculateTimeWorked([i]);
+              console.log(this.state.shifts);
             }
-            this.matchNames();
-            console.log(this.state.shifts);
           } else {
             console.log(response.error);
           }
@@ -107,14 +132,22 @@ class Shifts extends React.Component {
     })();
   };
 
-  matchNames() {
-    for (let i = 0; i < this.state.shifts.length; i += 1) {
-      for (let j = 0; j < this.state.currentOrganisationMembers.length; j += 1) {
-        if (this.state.shifts[i].userId === this.state.currentOrganisationMembers[j].id) {
-          this.state.shifts[i].name = this.state.currentOrganisationMembers[j].name;
-        }
+  matchNames(shift) {
+    for (let i = 0; i < this.state.currentOrganisationMembers.length; i += 1) {
+      if (this.state.shifts[shift].userId === this.state.currentOrganisationMembers[i].id) {
+        this.state.shifts[shift].name = this.state.currentOrganisationMembers[i].name;
       }
     }
+  }
+
+  calculateTimeWorked(shift) {
+    const start = new Date(this.state.shifts[shift].start);
+    const finish = new Date(this.state.shifts[shift].finish);
+
+    const diff = Math.abs(finish - start);
+    const hours = Math.floor((diff / 1000) / 60 / 60);
+    const minutes = Math.floor((diff / 1000) / 60) % 60;
+    this.state.shifts[shift].timeWorked = (`${hours} hours, ${minutes} minutes`);
   }
 
   render() {
@@ -136,17 +169,19 @@ class Shifts extends React.Component {
                 <TableCell align="right">Shift Start</TableCell>
                 <TableCell align="right">Shift Finish</TableCell>
                 <TableCell align="right">Break Length</TableCell>
+                <TableCell align="right">Time Worked</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {this.state.shifts.map(row => (
                 <TableRow key={row.id}>
                   <TableCell component="th" scope="row">
-                    {row.userId}
+                    {row.name}
                   </TableCell>
                   <TableCell align="right">{row.start}</TableCell>
                   <TableCell align="right">{row.finish}</TableCell>
                   <TableCell align="right">{row.breakLength}</TableCell>
+                  <TableCell align="right">{row.timeWorked}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
