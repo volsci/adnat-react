@@ -25,12 +25,15 @@ class Shifts extends React.Component {
   state = {
     shifts: [],
     currentUserId: 0,
+    currentOrganisationId: 0,
+    currentOrganisationHourly: 0,
     currentOrganisationMembers: [],
   };
 
   componentDidMount() {
     this.getCurrentOrganisationUsers();
     this.getCurrentUserId();
+    this.getOrganisations();
     this.getShifts();
   }
 
@@ -49,6 +52,7 @@ class Shifts extends React.Component {
           if (response.error === undefined) {
             this.setState({
               currentUserId: response.id,
+              currentOrganisationId: response.organisationId,
             });
           } else {
             console.log(response.error);
@@ -82,6 +86,38 @@ class Shifts extends React.Component {
     })();
   }
 
+  getOrganisations() {
+    const { cookies } = this.props;
+
+    (async () => {
+      await fetch('http://localhost:3000/organisations', {
+        headers: {
+          Authorization: cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      }).then(res => res.json())
+        .then((response) => {
+          if (response.error === undefined) {
+            this.getCurrentOrganisationHourly(response);
+          } else {
+            console.log(response.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    })();
+  }
+
+  getCurrentOrganisationHourly(organisations) {
+    for (let i = 0; i < organisations.length; i += 1) {
+      if (organisations[i].id === this.state.currentOrganisationId){
+        this.setState({
+          currentOrganisationHourly: organisations[i].hourlyRate,
+        });
+      }
+    }
+  }
+
   getShifts() {
     const { cookies } = this.props;
 
@@ -98,8 +134,7 @@ class Shifts extends React.Component {
             for (let i = 0; i < response.length; i += 1) {
               this.state.shifts.push(response[i]);
               this.matchNames([i]);
-              this.calculateTimeWorked([i]);
-              console.log(this.state.shifts);
+              this.calculateTimeAndPay([i]);
             }
           } else {
             console.log(response.error);
@@ -122,9 +157,9 @@ class Shifts extends React.Component {
         method: 'POST',
         body: JSON.stringify({
           userId: this.state.currentUserId,
-          start: '2018-01-03 10:15',
-          finish: '2018-01-03 12:20',
-          breakLength: 30,
+          start: '2018-01-03 10:00',
+          finish: '2018-01-03 17:00',
+          breakLength: 35,
         }),
       }).then(() => {
         this.getShifts();
@@ -140,7 +175,7 @@ class Shifts extends React.Component {
     }
   }
 
-  calculateTimeWorked(shift) {
+  calculateTimeAndPay(shift) {
     const start = new Date(this.state.shifts[shift].start);
     const finish = new Date(this.state.shifts[shift].finish);
     const breakLength = parseInt(this.state.shifts[shift].breakLength, 10);
@@ -150,11 +185,13 @@ class Shifts extends React.Component {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = Math.floor(totalMinutes % 60);
     this.state.shifts[shift].timeWorked = (`${hours} hours, ${minutes} minutes`);
+
+    const payThresholds = Math.floor(totalMinutes / 15);
+    this.state.shifts[shift].pay = payThresholds * (this.state.currentOrganisationHourly / 4);
   }
 
   render() {
     const { classes } = this.props;
-
     let shiftTable;
 
     if (this.state.shifts.length === 0) {
@@ -172,6 +209,7 @@ class Shifts extends React.Component {
                 <TableCell align="right">Shift Finish</TableCell>
                 <TableCell align="right">Break Length</TableCell>
                 <TableCell align="right">Time Worked</TableCell>
+                <TableCell align="right">Pay</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -184,6 +222,7 @@ class Shifts extends React.Component {
                   <TableCell align="right">{row.finish}</TableCell>
                   <TableCell align="right">{row.breakLength}</TableCell>
                   <TableCell align="right">{row.timeWorked}</TableCell>
+                  <TableCell align="right">{"$" + row.pay}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -207,6 +246,7 @@ class Shifts extends React.Component {
 Shifts.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   cookies: instanceOf(Cookies).isRequired,
+  currentOrganisationHourly: PropTypes.number.isRequired,
 };
 
 Shifts = withStyles(styles)(Shifts); // eslint-disable-line no-class-assign

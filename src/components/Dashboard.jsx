@@ -56,6 +56,7 @@ class Dashboard extends React.Component {
     newOrganisationName: '',
     newOrganisationHourly: 0,
     currentOrganisationId: 0,
+    currentOrganisationHourly: 0,
     error: false,
     errorMsg: '',
     organisations: [],
@@ -95,10 +96,12 @@ class Dashboard extends React.Component {
       }).then(res => res.json())
         .then((response) => {
           if (response.error === undefined) {
+            console.log("got organisation");
             this.setState({
               organisations: response,
             });
-          } else {
+            this.getCurrentOrganisationHourly();
+            } else {
             console.log(response.error);
           }
         })
@@ -128,6 +131,16 @@ class Dashboard extends React.Component {
         })
         .catch(error => console.error('Error:', error));
     })();
+  }
+
+  getCurrentOrganisationHourly() {
+    for (let i = 0; i < this.state.organisations.length; i += 1) {
+      if (this.state.organisations[i].id === this.state.currentOrganisationId){
+        this.setState({
+          currentOrganisationHourly: this.state.organisations[i].hourlyRate,
+        });
+      }
+    }
   }
 
   handleAccountButton = (event) => {
@@ -255,6 +268,7 @@ class Dashboard extends React.Component {
 
   render() {
     const { classes } = this.props;
+
 
     let createOrganisation;
     let listItems;
@@ -387,7 +401,7 @@ class Dashboard extends React.Component {
             {drawerContents}
           </div>
         </Drawer>
-        <Shifts />
+        <Shifts currentOrganisationHourly={this.state.currentOrganisationHourly}/>
 
         <Snackbar
           anchorOrigin={{
