@@ -96,7 +96,6 @@ class Dashboard extends React.Component {
       }).then(res => res.json())
         .then((response) => {
           if (response.error === undefined) {
-            console.log("got organisation");
             this.setState({
               organisations: response,
             });
@@ -401,7 +400,7 @@ class Dashboard extends React.Component {
             {drawerContents}
           </div>
         </Drawer>
-        <Shifts currentOrganisationHourly={this.state.currentOrganisationHourly}/>
+        <Shifts />
 
         <Snackbar
           anchorOrigin={{

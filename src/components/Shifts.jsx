@@ -246,7 +246,6 @@ class Shifts extends React.Component {
 Shifts.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   cookies: instanceOf(Cookies).isRequired,
-  currentOrganisationHourly: PropTypes.number.isRequired,
 };
 
 Shifts = withStyles(styles)(Shifts); // eslint-disable-line no-class-assign
