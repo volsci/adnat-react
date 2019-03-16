@@ -56,7 +56,6 @@ class Dashboard extends React.Component {
     newOrganisationName: '',
     newOrganisationHourly: 0,
     currentOrganisationId: 0,
-    currentOrganisationHourly: 0,
     error: false,
     errorMsg: '',
     organisations: [],
@@ -99,8 +98,7 @@ class Dashboard extends React.Component {
             this.setState({
               organisations: response,
             });
-            this.getCurrentOrganisationHourly();
-            } else {
+          } else {
             console.log(response.error);
           }
         })
@@ -130,16 +128,6 @@ class Dashboard extends React.Component {
         })
         .catch(error => console.error('Error:', error));
     })();
-  }
-
-  getCurrentOrganisationHourly() {
-    for (let i = 0; i < this.state.organisations.length; i += 1) {
-      if (this.state.organisations[i].id === this.state.currentOrganisationId){
-        this.setState({
-          currentOrganisationHourly: this.state.organisations[i].hourlyRate,
-        });
-      }
-    }
   }
 
   handleAccountButton = (event) => {

@@ -9,6 +9,10 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button/Button';
+import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
 
 const styles = theme => ({
   root: {
@@ -27,7 +31,8 @@ class Shifts extends React.Component {
     currentUserId: 0,
     currentOrganisationId: 0,
     currentOrganisationHourly: 0,
-    currentOrganisationMembers: [],
+    currentOrganisationUsers: [],
+    selectedUser: '',
   };
 
   componentDidMount() {
@@ -76,7 +81,7 @@ class Shifts extends React.Component {
         .then((response) => {
           if (response.error === undefined) {
             for (let i = 0; i < response.length; i += 1) {
-              this.state.currentOrganisationMembers.push(response[i]);
+              this.state.currentOrganisationUsers.push(response[i]);
             }
           } else {
             console.log(response.error);
@@ -110,7 +115,7 @@ class Shifts extends React.Component {
 
   getCurrentOrganisationHourly(organisations) {
     for (let i = 0; i < organisations.length; i += 1) {
-      if (organisations[i].id === this.state.currentOrganisationId){
+      if (organisations[i].id === this.state.currentOrganisationId) {
         this.setState({
           currentOrganisationHourly: organisations[i].hourlyRate,
         });
@@ -167,10 +172,18 @@ class Shifts extends React.Component {
     })();
   };
 
+  handleSelectUser = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      selectedUser: event.target.value,
+    });
+  };
+
   matchNames(shift) {
-    for (let i = 0; i < this.state.currentOrganisationMembers.length; i += 1) {
-      if (this.state.shifts[shift].userId === this.state.currentOrganisationMembers[i].id) {
-        this.state.shifts[shift].name = this.state.currentOrganisationMembers[i].name;
+    for (let i = 0; i < this.state.currentOrganisationUsers.length; i += 1) {
+      if (this.state.shifts[shift].userId === this.state.currentOrganisationUsers[i].id) {
+        this.state.shifts[shift].name = this.state.currentOrganisationUsers[i].name;
       }
     }
   }
@@ -193,6 +206,29 @@ class Shifts extends React.Component {
   render() {
     const { classes } = this.props;
     let shiftTable;
+
+    const userPicker = (
+      <FormControl fullWidth className={classes.formControl}>
+        <InputLabel htmlFor="employee-simple">Employee</InputLabel>
+        <Select
+          value={this.state.selectedUser}
+          onChange={this.handleSelectUser}
+          inputProps={{
+            name: 'employee',
+            id: 'employee-simple',
+          }}
+        >
+          {this.state.currentOrganisationUsers.map(user => (
+            <MenuItem
+              key={user.id}
+              value={user.name}
+            >
+              {user.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    );
 
     if (this.state.shifts.length === 0) {
       shiftTable = (
@@ -222,9 +258,21 @@ class Shifts extends React.Component {
                   <TableCell align="right">{row.finish}</TableCell>
                   <TableCell align="right">{row.breakLength}</TableCell>
                   <TableCell align="right">{row.timeWorked}</TableCell>
-                  <TableCell align="right">{"$" + row.pay}</TableCell>
+                  <TableCell align="right">{`$${row.pay}`}</TableCell>
                 </TableRow>
               ))}
+              <TableRow>
+                <TableCell align="left">{userPicker}</TableCell>
+                <TableCell align="right">Datepicker</TableCell>
+                <TableCell align="right">Datepicker</TableCell>
+                <TableCell align="right">Num Input</TableCell>
+                <TableCell align="right" />
+                <TableCell align="right">
+                  <Button onClick={this.handleCreateNewShift}>
+                    {'Create a New Shift'}
+                  </Button>
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </Paper>
@@ -235,9 +283,6 @@ class Shifts extends React.Component {
     return (
       <div>
         {shiftTable}
-        <Button onClick={this.handleCreateNewShift}>
-          {'Create a New Shift'}
-        </Button>
       </div>
     );
   }
