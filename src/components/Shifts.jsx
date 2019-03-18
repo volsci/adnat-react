@@ -13,6 +13,14 @@ import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
+import TextField from '@material-ui/core/TextField';
+import IconButton from '@material-ui/core/IconButton/IconButton';
+import Save from '@material-ui/icons/Save';
+import Delete from '@material-ui/icons/Delete';
+import Cancel from '@material-ui/icons/Cancel';
+import moment from 'moment/src/moment';
+import Snackbar from '@material-ui/core/Snackbar';
+import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
   root: {
@@ -20,52 +28,76 @@ const styles = theme => ({
     marginTop: theme.spacing.unit * 3,
     overflowX: 'auto',
   },
-  table: {
-    minWidth: 700,
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    width: '100%',
+  },
+  textField: {
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
+    width: 200,
+  },
+  tableRow: {
+    height: 60,
+  },
+  shiftEdit: {
+    display: 'flex',
   },
 });
 
 class Shifts extends React.Component {
   state = {
     shifts: [],
-    currentUserId: 0,
+    // currentUserId: 0,
     currentOrganisationId: 0,
     currentOrganisationHourly: 0,
     currentOrganisationUsers: [],
     selectedUser: '',
+    selectedUserId: 0,
+    selectedStartDate: '',
+    selectedFinishDate: '',
+    selectedBreakLength: 0,
+    selectedShift: false,
+    selectedShiftId: 0,
+    selectedShiftStartDate: '',
+    selectedShiftFinishDate: '',
+    selectedShiftBreakLength: 0,
+    error: false,
+    errorMsg: '',
   };
 
   componentDidMount() {
     this.getCurrentOrganisationUsers();
-    this.getCurrentUserId();
+    // this.getCurrentUserId();
     this.getOrganisations();
     this.getShifts();
   }
 
-  getCurrentUserId() {
-    const { cookies } = this.props;
-
-    (async () => {
-      await fetch('http://localhost:3000/users/me', {
-        headers: {
-          Authorization: cookies.get('sessionId'),
-          'Content-Type': 'application/json',
-        },
-        method: 'GET',
-      }).then(res => res.json())
-        .then((response) => {
-          if (response.error === undefined) {
-            this.setState({
-              currentUserId: response.id,
-              currentOrganisationId: response.organisationId,
-            });
-          } else {
-            console.log(response.error);
-          }
-        })
-        .catch(error => console.error('Error:', error));
-    })();
-  }
+  // getCurrentUserId() {
+  //   const { cookies } = this.props;
+  //
+  //   (async () => {
+  //     await fetch('http://localhost:3000/users/me', {
+  //       headers: {
+  //         Authorization: cookies.get('sessionId'),
+  //         'Content-Type': 'application/json',
+  //       },
+  //       method: 'GET',
+  //     }).then(res => res.json())
+  //       .then((response) => {
+  //         if (response.error === undefined) {
+  //           this.setState({
+  //             currentUserId: response.id,
+  //             currentOrganisationId: response.organisationId,
+  //           });
+  //         } else {
+  //           console.log(response.error);
+  //         }
+  //       })
+  //       .catch(error => console.error('Error:', error));
+  //   })();
+  // }
 
   getCurrentOrganisationUsers() {
     const { cookies } = this.props;
@@ -126,6 +158,11 @@ class Shifts extends React.Component {
   getShifts() {
     const { cookies } = this.props;
 
+    this.setState({
+      selectedShift: false,
+      selectedShiftId: 0,
+    });
+
     (async () => {
       await fetch('http://localhost:3000/shifts', {
         headers: {
@@ -141,6 +178,7 @@ class Shifts extends React.Component {
               this.matchNames([i]);
               this.calculateTimeAndPay([i]);
             }
+            console.log(this.state.shifts);
           } else {
             console.log(response.error);
           }
@@ -149,36 +187,194 @@ class Shifts extends React.Component {
     })();
   }
 
+  handleSnackBarOpen = (errorMsg) => {
+    this.setState({
+      error: true,
+      errorMsg,
+    });
+  };
+
+  handleSnackBarClose = () => {
+    this.setState({
+      error: false,
+      errorMsg: '',
+    });
+  };
+
   handleCreateNewShift = (event) => {
     event.preventDefault();
+
+    const { cookies } = this.props;
+
+    const startFormat = moment(this.state.selectedStartDate).format('llll');
+    const start = moment(startFormat);
+    const finishFormat = moment(this.state.selectedFinishDate).format('llll');
+    const finish = moment(finishFormat);
+    const breakLength = parseInt(this.state.selectedBreakLength, 10);
+
+    if (this.state.selectedUserId === 0) {
+      this.handleSnackBarOpen('Please select the employee who worked this shift.');
+    } else if (this.validateNewShift(start, finish, breakLength) === true) {
+      (async () => {
+        await fetch('http://localhost:3000/shifts', {
+          headers: {
+            Authorization: cookies.get('sessionId'),
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+          body: JSON.stringify({
+            userId: this.state.selectedUserId,
+            start: start._i,
+            finish: finish._i,
+            breakLength: this.state.selectedBreakLength,
+          }),
+        }).then(() => {
+          this.getShifts();
+        }).catch(error => console.error('Error:', error));
+      })();
+    }
+  };
+
+  handleUpdateShift = (event, shift) => {
+    event.preventDefault();
+
+    const { cookies } = this.props;
+
+    const startFormat = moment(this.state.selectedShiftStartDate).format('llll');
+    const start = moment(startFormat);
+    const finishFormat = moment(this.state.selectedShiftFinishDate).format('llll');
+    const finish = moment(finishFormat);
+    const breakLength = parseInt(this.state.selectedShiftBreakLength, 10);
+
+    if (this.validateNewShift(start, finish, breakLength) === true) {
+      (async () => {
+        await fetch(`http://localhost:3000/shifts/${shift}`, {
+          headers: {
+            Authorization: cookies.get('sessionId'),
+            'Content-Type': 'application/json',
+          },
+          method: 'PUT',
+          body: JSON.stringify({
+            start: start._i,
+            finish: finish._i,
+            breakLength,
+          }),
+        }).then(() => {
+          this.getShifts();
+        }).catch(error => console.error('Error:', error));
+      })();
+    }
+  };
+
+  handleDeleteShift = (event, shift) => {
+    event.preventDefault();
+
     const { cookies } = this.props;
 
     (async () => {
-      await fetch('http://localhost:3000/shifts', {
+      await fetch(`http://localhost:3000/shifts/${shift}`, {
         headers: {
           Authorization: cookies.get('sessionId'),
           'Content-Type': 'application/json',
         },
-        method: 'POST',
-        body: JSON.stringify({
-          userId: this.state.currentUserId,
-          start: '2018-01-03 10:00',
-          finish: '2018-01-03 17:00',
-          breakLength: 35,
-        }),
+        method: 'DELETE',
       }).then(() => {
         this.getShifts();
       }).catch(error => console.error('Error:', error));
     })();
   };
 
-  handleSelectUser = (event) => {
+  handleSelectUser = (event, child) => {
     event.preventDefault();
 
     this.setState({
       selectedUser: event.target.value,
+      selectedUserId: child.props.id,
     });
   };
+
+  handleSelectStartDate = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      selectedStartDate: event.target.value,
+    });
+  };
+
+  handleSelectFinishDate = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      selectedFinishDate: event.target.value,
+    });
+  };
+
+  handleSelectBreakLength = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      selectedBreakLength: event.target.value,
+    });
+  };
+
+  handleSelectShiftStartDate = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      selectedShiftStartDate: event.target.value,
+    });
+  };
+
+  handleSelectShiftFinishDate = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      selectedShiftFinishDate: event.target.value,
+    });
+  };
+
+  handleSelectShiftBreakLength = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      selectedShiftBreakLength: event.target.value,
+    });
+  };
+
+  handleDoubleClickShift = (event, shift) => {
+    event.preventDefault();
+
+    this.setState({
+      selectedShift: true,
+      selectedShiftId: shift,
+    });
+  };
+
+  handleCancelShiftEdit = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      selectedShift: false,
+      selectedShiftId: 0,
+    });
+  };
+
+  validateNewShift(start, finish, breakLength) {
+    if (start._i === 'Invalid date' || finish._i === 'Invalid date') {
+      this.handleSnackBarOpen('Please enter valid shift start and finish times.');
+      return false;
+    } if (finish.diff(start, 'minutes') < 0) {
+      this.handleSnackBarOpen('The shift ends before it starts. Please enter valid shift start and finish times.');
+      return false;
+    } if (finish.diff(start, 'minutes') < breakLength) {
+      this.handleSnackBarOpen('Please enter a valid break length.');
+      return false;
+    } if (breakLength < 0) {
+      this.handleSnackBarOpen('Please enter a valid break length.');
+      return false;
+    }
+    return true;
+  }
 
   matchNames(shift) {
     for (let i = 0; i < this.state.currentOrganisationUsers.length; i += 1) {
@@ -189,14 +385,18 @@ class Shifts extends React.Component {
   }
 
   calculateTimeAndPay(shift) {
-    const start = new Date(this.state.shifts[shift].start);
-    const finish = new Date(this.state.shifts[shift].finish);
+    const startFormat = moment(this.state.shifts[shift].start).format('llll');
+    const finishFormat = moment(this.state.shifts[shift].finish).format('llll');
+
+    const start = moment(startFormat);
+    const finish = moment(finishFormat);
+
     const breakLength = parseInt(this.state.shifts[shift].breakLength, 10);
 
-    const diff = Math.abs(finish - start);
-    const totalMinutes = (Math.floor((diff / 1000) / 60)) - breakLength;
+    const totalMinutes = finish.diff(start, 'minutes') - breakLength;
     const hours = Math.floor(totalMinutes / 60);
     const minutes = Math.floor(totalMinutes % 60);
+
     this.state.shifts[shift].timeWorked = (`${hours} hours, ${minutes} minutes`);
 
     const payThresholds = Math.floor(totalMinutes / 15);
@@ -213,13 +413,12 @@ class Shifts extends React.Component {
         <Select
           value={this.state.selectedUser}
           onChange={this.handleSelectUser}
-          inputProps={{
-            name: 'employee',
-            id: 'employee-simple',
-          }}
+          label="Employee"
+          id="employee-simple"
         >
           {this.state.currentOrganisationUsers.map(user => (
             <MenuItem
+              id={user.id}
               key={user.id}
               value={user.name}
             >
@@ -230,14 +429,124 @@ class Shifts extends React.Component {
       </FormControl>
     );
 
-    if (this.state.shifts.length === 0) {
+    const startDatePicker = (
+      <form className={classes.container} noValidate>
+        <TextField
+          id="datetime"
+          label="Start"
+          type="datetime-local"
+          fullWidth
+          value={this.state.selectedStartDate}
+          onChange={this.handleSelectStartDate}
+          className={classes.textField}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </form>
+    );
+
+    const finishDatePicker = (
+      <form className={classes.container} noValidate>
+        <TextField
+          fullWidth
+          id="datetime-local"
+          label="Finish"
+          type="datetime-local"
+          value={this.state.selectedFinishDate}
+          onChange={this.handleSelectFinishDate}
+          className={classes.textField}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </form>
+    );
+
+    const breakLengthPicker = (
+      <TextField
+        id="standard-number"
+        label="Break Length"
+        value={this.state.selectedBreakLength}
+        onChange={this.handleSelectBreakLength}
+        type="number"
+        className={classes.textField}
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+    );
+
+    const startDatePickerShiftEdit = (
+      <form className={classes.container} noValidate>
+        <TextField
+          id="datetime"
+          label="Start"
+          type="datetime-local"
+          fullWidth
+          value={this.state.selectedShiftStartDate}
+          onChange={this.handleSelectShiftStartDate}
+          className={classes.textField}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </form>
+    );
+
+    const finishDatePickerShiftEdit = (
+      <form className={classes.container} noValidate>
+        <TextField
+          fullWidth
+          id="datetime-local"
+          label="Finish"
+          type="datetime-local"
+          value={this.state.selectedShiftFinishDate}
+          onChange={this.handleSelectShiftFinishDate}
+          className={classes.textField}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </form>
+    );
+
+    const breakLengthPickerShiftEdit = (
+      <TextField
+        id="standard-number"
+        label="Break Length"
+        value={this.state.selectedShiftBreakLength}
+        onChange={this.handleSelectShiftBreakLength}
+        type="number"
+        className={classes.textField}
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+    );
+
+    const shiftEdit = (
+      <div className={classes.shiftEdit}>
+        <IconButton aria-label="Menu" onClick={event => this.handleUpdateShift(event, this.state.selectedShiftId)}>
+          <Save />
+        </IconButton>
+        <IconButton aria-label="Menu" onClick={event => this.handleDeleteShift(event, this.state.selectedShiftId)}>
+          <Delete />
+        </IconButton>
+        <IconButton aria-label="Menu" onClick={this.handleCancelShiftEdit}>
+          <Cancel />
+        </IconButton>
+      </div>
+    );
+
+    if (this.state.currentOrganisationId === 0) {
       shiftTable = (
         <div>Join or Create New Organisation From the Menu</div>
       );
     } else {
       shiftTable = (
         <Paper className={classes.root}>
-          <Table className={classes.table}>
+          <Table>
             <TableHead>
               <TableRow>
                 <TableCell align="left">Employee Name</TableCell>
@@ -250,24 +559,28 @@ class Shifts extends React.Component {
             </TableHead>
             <TableBody>
               {this.state.shifts.map(row => (
-                <TableRow key={row.id}>
+                <TableRow
+                  className={classes.tableRow}
+                  key={row.id}
+                  onDoubleClick={event => this.handleDoubleClickShift(event, row.id)}
+                >
                   <TableCell component="th" scope="row">
                     {row.name}
                   </TableCell>
-                  <TableCell align="right">{row.start}</TableCell>
-                  <TableCell align="right">{row.finish}</TableCell>
-                  <TableCell align="right">{row.breakLength}</TableCell>
-                  <TableCell align="right">{row.timeWorked}</TableCell>
-                  <TableCell align="right">{`$${row.pay}`}</TableCell>
+                  <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (startDatePickerShiftEdit) : (row.start)}</TableCell>
+                  <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (finishDatePickerShiftEdit) : (row.finish)}</TableCell>
+                  <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (breakLengthPickerShiftEdit) : (row.breakLength)}</TableCell>
+                  <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (<div />) : (row.timeWorked)}</TableCell>
+                  <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (shiftEdit) : (`$${row.pay}`)}</TableCell>
                 </TableRow>
               ))}
-              <TableRow>
-                <TableCell align="left">{userPicker}</TableCell>
-                <TableCell align="right">Datepicker</TableCell>
-                <TableCell align="right">Datepicker</TableCell>
-                <TableCell align="right">Num Input</TableCell>
+              <TableRow className={classes.tableRow}>
+                <TableCell component="th" scope="row">{userPicker}</TableCell>
+                <TableCell align="right">{startDatePicker}</TableCell>
+                <TableCell align="right">{finishDatePicker}</TableCell>
+                <TableCell align="right">{breakLengthPicker}</TableCell>
                 <TableCell align="right" />
-                <TableCell align="right">
+                <TableCell align="center">
                   <Button onClick={this.handleCreateNewShift}>
                     {'Create a New Shift'}
                   </Button>
@@ -283,6 +596,31 @@ class Shifts extends React.Component {
     return (
       <div>
         {shiftTable}
+
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={this.state.error}
+          autoHideDuration={3000}
+          onClose={this.handleSnackBarClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">{this.state.errorMsg}</span>}
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              className={classes.close}
+              onClick={this.handleSnackBarClose}
+            >
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
       </div>
     );
   }

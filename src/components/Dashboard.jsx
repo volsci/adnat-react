@@ -23,6 +23,9 @@ import TextField from '@material-ui/core/TextField/TextField';
 import Paper from '@material-ui/core/Paper';
 import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import CloseIcon from '@material-ui/icons/Close';
+import ReactHoverObserver from 'react-hover-observer';
+import Edit from '@material-ui/icons/Edit';
+import Delete from '@material-ui/icons/Delete';
 import Shifts from './Shifts';
 
 const styles = theme => ({
@@ -59,6 +62,10 @@ class Dashboard extends React.Component {
     error: false,
     errorMsg: '',
     organisations: [],
+    editOrganisation: false,
+    editOrganisationId: 0,
+    editedOrganisationName: '',
+    editedOrganisationHourly: 0,
   };
 
   componentWillMount() {
@@ -170,6 +177,22 @@ class Dashboard extends React.Component {
     });
   };
 
+  handleOrganisationNameEdit = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      editedOrganisationName: event.target.value,
+    });
+  };
+
+  handleOrganisationHourlyEdit = (event) => {
+    event.preventDefault();
+
+    this.setState({
+      editedOrganisationHourly: event.target.value,
+    });
+  };
+
   handleSnackBarOpen = (errorMsg) => {
     this.setState({
       error: true,
@@ -181,6 +204,15 @@ class Dashboard extends React.Component {
     this.setState({
       error: false,
       errorMsg: '',
+    });
+  };
+
+  handleOrganisationEditor = (event, organisation) => {
+    event.preventDefault();
+
+    this.setState({
+      editOrganisation: !this.state.editOrganisation,
+      editOrganisationId: organisation,
     });
   };
 
@@ -223,6 +255,8 @@ class Dashboard extends React.Component {
       this.handleSnackBarOpen('Please provide a name');
     } else if (Number.isNaN(parseInt(this.state.newOrganisationHourly, 10)) === true) {
       this.handleSnackBarOpen('Hourly rate must be a number');
+    } else if (parseInt(this.state.newOrganisationHourly, 10) < 1) {
+      this.handleSnackBarOpen('Hourly rate must be greater than 0');
     } else {
       (async () => {
         await fetch('http://localhost:3000/organisations/create_join', {
@@ -248,6 +282,46 @@ class Dashboard extends React.Component {
               this.handleSnackBarOpen(response.error);
             }
           })
+          .catch(error => console.error('Error:', error));
+      })();
+    }
+  };
+
+  handleUpdateOrganisation = (event) => {
+    event.preventDefault();
+    const { cookies } = this.props;
+
+    if (this.state.editedOrganisationName === '') {
+      this.handleSnackBarOpen('Please provide a name');
+    } else if (Number.isNaN(parseInt(this.state.editedOrganisationHourly, 10)) === true) {
+      this.handleSnackBarOpen('Hourly rate must be a number');
+    } else if (parseInt(this.state.editedOrganisationHourly, 10) < 1) {
+      this.handleSnackBarOpen('Hourly rate must be greater than 0');
+    } else {
+      (async () => {
+        await fetch(`http://localhost:3000/organisations/${this.state.editOrganisationId}`, {
+          headers: {
+            Authorization: cookies.get('sessionId'),
+            'Content-Type': 'application/json',
+          },
+          method: 'PUT',
+          body: JSON.stringify({
+            name: this.state.editedOrganisationName,
+            hourlyRate: this.state.editedOrganisationHourly,
+          }),
+        }).then((response) => {
+          if (response.error === undefined) {
+            this.setState({
+              editedOrganisationName: '',
+              editedOrganisationHourly: 0,
+              editOrganisation: false,
+              editOrganisationId: 0,
+            });
+            this.componentDidMount();
+          } else {
+            this.handleSnackBarOpen(response.error);
+          }
+        })
           .catch(error => console.error('Error:', error));
       })();
     }
@@ -319,13 +393,72 @@ class Dashboard extends React.Component {
         <List>
           {
                       this.state.organisations.map(organisation => (
-                        <ListItem
-                          selected={organisation.id === this.state.currentOrganisationId}
-                          key={organisation.id}
-                        >
-                          <ListItemIcon><Work /></ListItemIcon>
-                          <ListItemText primary={organisation.name} secondary={`$${organisation.hourlyRate} p/h`} />
-                        </ListItem>
+                        <ReactHoverObserver>
+                          {({ isHovering }) => (
+                            <ListItem
+                              selected={organisation.id === this.state.currentOrganisationId}
+                              key={organisation.id}
+                            >
+                              <ListItemIcon><Work /></ListItemIcon>
+                              { this.state.editOrganisation && organisation.id
+                              === this.state.editOrganisationId ? (
+                                <div>
+                                  <TextField
+                                    className={classes.input}
+                                    id="outlined-name"
+                                    label="Organisation Name"
+                                    margin="normal"
+                                    onChange={this.handleOrganisationNameEdit}
+                                    fullWidth
+                                  />
+                                  <TextField
+                                    className={classes.input}
+                                    id="outlined-rate"
+                                    label="Hourly Rate"
+                                    margin="normal"
+                                    onChange={this.handleOrganisationHourlyEdit}
+                                    fullWidth
+                                  />
+                                  <IconButton
+                                    className={classes.menuButton}
+                                    aria-label="Menu"
+                                    onClick={this.handleUpdateOrganisation}
+                                  >
+                                    <Save />
+                                  </IconButton>
+                                  <IconButton
+                                    className={classes.menuButton}
+                                    aria-label="Menu"
+                                    onClick={this.handleOrganisationEditor}
+                                  >
+                                    <Cancel />
+                                  </IconButton>
+                                </div>
+                                ) : (
+                                  <div>
+                                    <ListItemText
+                                      primary={organisation.name}
+                                      secondary={`$${organisation.hourlyRate} p/h`}
+                                    />
+                                    <IconButton
+                                      className={classes.menuButton}
+                                      aria-label="Menu"
+                                      onClick={event => this.handleOrganisationEditor(event,
+                                        organisation.id)}
+                                    >
+                                      { isHovering ? <Edit /> : null }
+                                    </IconButton>
+                                    <IconButton className={classes.menuButton} aria-label="Menu">
+                                      { isHovering
+                                      && (this.state.currentOrganisationId === organisation.id)
+                                        ? <Delete /> : null }
+                                    </IconButton>
+                                  </div>
+                                )
+                             }
+                            </ListItem>
+                          )}
+                        </ReactHoverObserver>
                       ))
                     }
         </List>
@@ -334,20 +467,23 @@ class Dashboard extends React.Component {
       listItems = (
         <List>
           {
-                      this.state.organisations.map(organisation => (
-                        <ListItem
-                          button
-                          selected={organisation.id
-                          === this.state.currentOrganisationId}
-                          key={organisation.id}
-                          onClick={event => this.handleLeaveAndJoinOrganisation(event,
-                            organisation.id)}
-                        >
-                          <ListItemIcon><Work /></ListItemIcon>
-                          <ListItemText primary={organisation.name} secondary={`$${organisation.hourlyRate} p/h`} />
-                        </ListItem>
-                      ))
-                    }
+            this.state.organisations.map(organisation => (
+
+              <ListItem
+                button
+                selected={organisation.id
+                === this.state.currentOrganisationId}
+                key={organisation.id}
+                onClick={event => this.handleLeaveAndJoinOrganisation(event,
+                  organisation.id)}
+              >
+                <ListItemIcon><Work /></ListItemIcon>
+                <ListItemText primary={organisation.name} secondary={`$${organisation.hourlyRate} p/h`} />
+
+              </ListItem>
+
+            ))
+          }
         </List>
       );
     }
