@@ -12,7 +12,6 @@ import Button from '@material-ui/core/Button/Button';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton/IconButton';
 import Save from '@material-ui/icons/Save';
@@ -21,6 +20,8 @@ import Cancel from '@material-ui/icons/Cancel';
 import moment from 'moment/src/moment';
 import Snackbar from '@material-ui/core/Snackbar';
 import CloseIcon from '@material-ui/icons/Close';
+import CalendarToday from '@material-ui/icons/CalendarToday';
+import Grid from '@material-ui/core/Grid';
 
 const styles = theme => ({
   root: {
@@ -34,22 +35,41 @@ const styles = theme => ({
     width: '100%',
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    flex: 1,
     width: 200,
   },
   tableRow: {
     height: 60,
   },
   shiftEdit: {
-    display: 'flex',
+    flex: 1,
+  },
+  text: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  card: {
+    margin: theme.spacing.unit * 2,
+    maxWidth: 400,
+    width: '100%',
+    height: '100%',
+  },
+  icon: {
+    marginTop: theme.spacing.unit * 10,
+    margin: theme.spacing.unit * 2,
+    width: 200,
+    height: 200,
+  },
+  exit: {
+    marginRight: theme.spacing.unit,
   },
 });
 
 class Shifts extends React.Component {
   state = {
     shifts: [],
-    // currentUserId: 0,
+    currentUserId: 0,
     currentOrganisationId: 0,
     currentOrganisationHourly: 0,
     currentOrganisationUsers: [],
@@ -69,35 +89,26 @@ class Shifts extends React.Component {
 
   componentDidMount() {
     this.getCurrentOrganisationUsers();
-    // this.getCurrentUserId();
-    this.getOrganisations();
-    this.getShifts();
   }
 
-  // getCurrentUserId() {
-  //   const { cookies } = this.props;
-  //
-  //   (async () => {
-  //     await fetch('http://localhost:3000/users/me', {
-  //       headers: {
-  //         Authorization: cookies.get('sessionId'),
-  //         'Content-Type': 'application/json',
-  //       },
-  //       method: 'GET',
-  //     }).then(res => res.json())
-  //       .then((response) => {
-  //         if (response.error === undefined) {
-  //           this.setState({
-  //             currentUserId: response.id,
-  //             currentOrganisationId: response.organisationId,
-  //           });
-  //         } else {
-  //           console.log(response.error);
-  //         }
-  //       })
-  //       .catch(error => console.error('Error:', error));
-  //   })();
-  // }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.currentUserId !== this.props.currentUserId) {
+      this.setState({
+        currentUserId: nextProps.currentUserId,
+      });
+    }
+
+    if (nextProps.currentOrganisationId !== this.props.currentOrganisationId) {
+      this.setState({
+        currentOrganisationId: nextProps.currentOrganisationId,
+      });
+    }
+
+    if (nextProps.organisations !== this.props.organisations) {
+      this.getCurrentOrganisationDetails(nextProps.organisations);
+      this.getShifts();
+    }
+  }
 
   getCurrentOrganisationUsers() {
     const { cookies } = this.props;
@@ -115,41 +126,18 @@ class Shifts extends React.Component {
             for (let i = 0; i < response.length; i += 1) {
               this.state.currentOrganisationUsers.push(response[i]);
             }
-          } else {
-            console.log(response.error);
           }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.error(`Error:${error}`));
     })();
   }
 
-  getOrganisations() {
-    const { cookies } = this.props;
-
-    (async () => {
-      await fetch('http://localhost:3000/organisations', {
-        headers: {
-          Authorization: cookies.get('sessionId'),
-          'Content-Type': 'application/json',
-        },
-        method: 'GET',
-      }).then(res => res.json())
-        .then((response) => {
-          if (response.error === undefined) {
-            this.getCurrentOrganisationHourly(response);
-          } else {
-            console.log(response.error);
-          }
-        })
-        .catch(error => console.error('Error:', error));
-    })();
-  }
-
-  getCurrentOrganisationHourly(organisations) {
+  getCurrentOrganisationDetails(organisations) {
     for (let i = 0; i < organisations.length; i += 1) {
       if (organisations[i].id === this.state.currentOrganisationId) {
         this.setState({
           currentOrganisationHourly: organisations[i].hourlyRate,
+          currentOrganisationName: organisations[i].name,
         });
       }
     }
@@ -157,11 +145,6 @@ class Shifts extends React.Component {
 
   getShifts() {
     const { cookies } = this.props;
-
-    this.setState({
-      selectedShift: false,
-      selectedShiftId: 0,
-    });
 
     (async () => {
       await fetch('http://localhost:3000/shifts', {
@@ -173,12 +156,14 @@ class Shifts extends React.Component {
       }).then(res => res.json())
         .then((response) => {
           if (response.error === undefined) {
-            for (let i = 0; i < response.length; i += 1) {
-              this.state.shifts.push(response[i]);
-              this.matchNames([i]);
-              this.calculateTimeAndPay([i]);
+            const tempShift = response;
+            for (let i = 0; i < tempShift.length; i += 1) {
+              this.matchNames(tempShift[i]);
+              this.calculateTimeAndPay(tempShift[i]);
             }
-            console.log(this.state.shifts);
+            this.setState({
+              shifts: tempShift,
+            });
           } else {
             console.log(response.error);
           }
@@ -229,6 +214,11 @@ class Shifts extends React.Component {
             breakLength: this.state.selectedBreakLength,
           }),
         }).then(() => {
+          this.setState({
+            selectedStartDate: '',
+            selectedFinishDate: '',
+            selectedBreakLength: '',
+          });
           this.getShifts();
         }).catch(error => console.error('Error:', error));
       })();
@@ -260,6 +250,10 @@ class Shifts extends React.Component {
             breakLength,
           }),
         }).then(() => {
+          this.setState({
+            selectedShift: false,
+            selectedShiftId: 0,
+          });
           this.getShifts();
         }).catch(error => console.error('Error:', error));
       })();
@@ -279,7 +273,45 @@ class Shifts extends React.Component {
         },
         method: 'DELETE',
       }).then(() => {
+        this.setState({
+          selectedShift: false,
+          selectedShiftId: 0,
+        });
         this.getShifts();
+      }).catch(error => console.error('Error:', error));
+    })();
+  };
+
+  handleDeleteShiftsOnLeave = (event) => {
+    event.preventDefault();
+
+    const { cookies } = this.props;
+
+    const currentUserShifts = [];
+    this.matchCurrentUserShifts(currentUserShifts);
+
+    for (let i = 0; i < currentUserShifts.length; i += 1) {
+      (async () => {
+        await fetch(`http://localhost:3000/shifts/${currentUserShifts[i]}`, {
+          headers: {
+            Authorization: cookies.get('sessionId'),
+            'Content-Type': 'application/json',
+          },
+          method: 'DELETE',
+        }).then(() => {
+        }).catch(error => console.error('Error:', error));
+      })();
+    }
+
+    (async () => {
+      await fetch('http://localhost:3000/organisations/leave', {
+        headers: {
+          Authorization: cookies.get('sessionId'),
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      }).then(() => {
+        this.props.leaveOrganisation();
       }).catch(error => console.error('Error:', error));
     })();
   };
@@ -341,7 +373,7 @@ class Shifts extends React.Component {
     });
   };
 
-  handleDoubleClickShift = (event, shift) => {
+  handleClickShift = (event, shift) => {
     event.preventDefault();
 
     this.setState({
@@ -378,42 +410,49 @@ class Shifts extends React.Component {
 
   matchNames(shift) {
     for (let i = 0; i < this.state.currentOrganisationUsers.length; i += 1) {
-      if (this.state.shifts[shift].userId === this.state.currentOrganisationUsers[i].id) {
-        this.state.shifts[shift].name = this.state.currentOrganisationUsers[i].name;
+      if (shift.userId === this.state.currentOrganisationUsers[i].id) {
+        shift.name = this.state.currentOrganisationUsers[i].name;
+      }
+    }
+  }
+
+  matchCurrentUserShifts(currentUserShifts) {
+    for (let i = 0; i < this.state.shifts.length; i += 1) {
+      if (this.state.shifts[i].userId === this.state.currentUserId) {
+        currentUserShifts.push(this.state.shifts[i].id);
       }
     }
   }
 
   calculateTimeAndPay(shift) {
-    const startFormat = moment(this.state.shifts[shift].start).format('llll');
-    const finishFormat = moment(this.state.shifts[shift].finish).format('llll');
+    const startFormat = moment(shift.start).format('llll');
+    const finishFormat = moment(shift.finish).format('llll');
 
     const start = moment(startFormat);
     const finish = moment(finishFormat);
 
-    const breakLength = parseInt(this.state.shifts[shift].breakLength, 10);
+    const breakLength = parseInt(shift.breakLength, 10);
 
     const totalMinutes = finish.diff(start, 'minutes') - breakLength;
     const hours = Math.floor(totalMinutes / 60);
     const minutes = Math.floor(totalMinutes % 60);
 
-    this.state.shifts[shift].timeWorked = (`${hours} hours, ${minutes} minutes`);
+    shift.timeWorked = (`${hours} hours, ${minutes} minutes`);
 
     const payThresholds = Math.floor(totalMinutes / 15);
-    this.state.shifts[shift].pay = payThresholds * (this.state.currentOrganisationHourly / 4);
+    shift.pay = payThresholds * (this.state.currentOrganisationHourly / 4);
   }
 
   render() {
     const { classes } = this.props;
+
     let shiftTable;
 
     const userPicker = (
-      <FormControl fullWidth className={classes.formControl}>
-        <InputLabel htmlFor="employee-simple">Employee</InputLabel>
+      <FormControl fullWidth className={classes.textField}>
         <Select
           value={this.state.selectedUser}
           onChange={this.handleSelectUser}
-          label="Employee"
           id="employee-simple"
         >
           {this.state.currentOrganisationUsers.map(user => (
@@ -433,7 +472,6 @@ class Shifts extends React.Component {
       <form className={classes.container} noValidate>
         <TextField
           id="datetime"
-          label="Start"
           type="datetime-local"
           fullWidth
           value={this.state.selectedStartDate}
@@ -451,7 +489,6 @@ class Shifts extends React.Component {
         <TextField
           fullWidth
           id="datetime-local"
-          label="Finish"
           type="datetime-local"
           value={this.state.selectedFinishDate}
           onChange={this.handleSelectFinishDate}
@@ -466,7 +503,6 @@ class Shifts extends React.Component {
     const breakLengthPicker = (
       <TextField
         id="standard-number"
-        label="Break Length"
         value={this.state.selectedBreakLength}
         onChange={this.handleSelectBreakLength}
         type="number"
@@ -481,7 +517,6 @@ class Shifts extends React.Component {
       <form className={classes.container} noValidate>
         <TextField
           id="datetime"
-          label="Start"
           type="datetime-local"
           fullWidth
           value={this.state.selectedShiftStartDate}
@@ -499,7 +534,6 @@ class Shifts extends React.Component {
         <TextField
           fullWidth
           id="datetime-local"
-          label="Finish"
           type="datetime-local"
           value={this.state.selectedShiftFinishDate}
           onChange={this.handleSelectShiftFinishDate}
@@ -514,7 +548,6 @@ class Shifts extends React.Component {
     const breakLengthPickerShiftEdit = (
       <TextField
         id="standard-number"
-        label="Break Length"
         value={this.state.selectedShiftBreakLength}
         onChange={this.handleSelectShiftBreakLength}
         type="number"
@@ -539,13 +572,28 @@ class Shifts extends React.Component {
       </div>
     );
 
-    if (this.state.currentOrganisationId === 0) {
+    if (this.state.currentOrganisationId < 1) {
       shiftTable = (
-        <div>Join or Create New Organisation From the Menu</div>
+        <Grid container justify="center" alignItems="center" direction="column">
+          <Grid item>
+            <CalendarToday className={classes.icon} />
+          </Grid>
+          <h2 className={classes.text}>Join an organisation to get started!</h2>
+        </Grid>
+
       );
     } else {
       shiftTable = (
         <Paper className={classes.root}>
+          <Grid container justify="flex-end" alignItems="flex-start">
+            <IconButton className={classes.exit} aria-label="Menu" onClick={this.handleDeleteShiftsOnLeave}>
+              <Cancel />
+            </IconButton>
+          </Grid>
+
+          <Grid container justify="center" alignItems="center" direction="column">
+            <h1 className={classes.text}>{this.state.currentOrganisationName}</h1>
+          </Grid>
           <Table>
             <TableHead>
               <TableRow>
@@ -562,7 +610,7 @@ class Shifts extends React.Component {
                 <TableRow
                   className={classes.tableRow}
                   key={row.id}
-                  onDoubleClick={event => this.handleDoubleClickShift(event, row.id)}
+                  onDoubleClick={event => this.handleClickShift(event, row.id)}
                 >
                   <TableCell component="th" scope="row">
                     {row.name}
@@ -570,7 +618,7 @@ class Shifts extends React.Component {
                   <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (startDatePickerShiftEdit) : (row.start)}</TableCell>
                   <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (finishDatePickerShiftEdit) : (row.finish)}</TableCell>
                   <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (breakLengthPickerShiftEdit) : (row.breakLength)}</TableCell>
-                  <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (<div />) : (row.timeWorked)}</TableCell>
+                  <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (<div>——</div>) : (row.timeWorked)}</TableCell>
                   <TableCell align="right">{this.state.selectedShift && this.state.selectedShiftId === row.id ? (shiftEdit) : (`$${row.pay}`)}</TableCell>
                 </TableRow>
               ))}
@@ -579,8 +627,8 @@ class Shifts extends React.Component {
                 <TableCell align="right">{startDatePicker}</TableCell>
                 <TableCell align="right">{finishDatePicker}</TableCell>
                 <TableCell align="right">{breakLengthPicker}</TableCell>
-                <TableCell align="right" />
-                <TableCell align="center">
+                <TableCell align="right"> —— </TableCell>
+                <TableCell align="right">
                   <Button onClick={this.handleCreateNewShift}>
                     {'Create a New Shift'}
                   </Button>
@@ -594,7 +642,7 @@ class Shifts extends React.Component {
     }
 
     return (
-      <div>
+      <div key={this.state.shifts}>
         {shiftTable}
 
         <Snackbar
@@ -629,6 +677,10 @@ class Shifts extends React.Component {
 Shifts.propTypes = {
   classes: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   cookies: instanceOf(Cookies).isRequired,
+  currentUserId: PropTypes.number.isRequired,
+  currentOrganisationId: PropTypes.number, // eslint-disable-line react/require-default-props
+  organisations: PropTypes.array.isRequired, // eslint-disable-line react/forbid-prop-types
+  leaveOrganisation: PropTypes.func.isRequired,
 };
 
 Shifts = withStyles(styles)(Shifts); // eslint-disable-line no-class-assign

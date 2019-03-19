@@ -21,6 +21,7 @@ import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField/TextField';
 import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import CloseIcon from '@material-ui/icons/Close';
+import Slide from '@material-ui/core/Slide';
 
 const styles = theme => ({
   root: {
@@ -515,18 +516,21 @@ class Account extends React.Component {
           </Toolbar>
         </AppBar>
 
-        <Grid container justify="center" alignItems="center" direction="column">
-          <Grid item>
-            <Avatar src="https://blogtimenow.com/wp-content/uploads/2014/06/hide-facebook-profile-picture-notification.jpg" className={classes.avatar} />
+        <Slide direction="up" in mountOnEnter unmountOnExit>
+
+          <Grid container justify="center" alignItems="center" direction="column">
+            <Grid item>
+              <Avatar src="https://blogtimenow.com/wp-content/uploads/2014/06/hide-facebook-profile-picture-notification.jpg" className={classes.avatar} />
+            </Grid>
+            <Card className={classes.card}>
+              {nameField}
+              <Divider variant="middle" />
+              {emailField}
+              <Divider variant="middle" />
+              {passwordField}
+            </Card>
           </Grid>
-          <Card className={classes.card}>
-            {nameField}
-            <Divider variant="middle" />
-            {emailField}
-            <Divider variant="middle" />
-            {passwordField}
-          </Card>
-        </Grid>
+        </Slide>
 
         <Snackbar
           anchorOrigin={{

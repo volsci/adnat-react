@@ -25,7 +25,7 @@ import Snackbar from '@material-ui/core/Snackbar/Snackbar';
 import CloseIcon from '@material-ui/icons/Close';
 import ReactHoverObserver from 'react-hover-observer';
 import Edit from '@material-ui/icons/Edit';
-import Delete from '@material-ui/icons/Delete';
+import Grid from '@material-ui/core/Grid';
 import Shifts from './Shifts';
 
 const styles = theme => ({
@@ -48,6 +48,24 @@ const styles = theme => ({
   paper: {
     margin: theme.spacing.unit,
   },
+  menuItem: {
+    flexGrow: 1,
+    height: 60,
+  },
+  menuText: {
+    textAlign: 'center',
+    margin: theme.spacing.unit * 2,
+  },
+  menuSmallButtons: {
+    textAlign: 'center',
+  },
+  menuCreateOrganisation: {
+    justifyContent: 'center',
+  },
+  menuInput: {
+    margin: theme.spacing.unit,
+    width: 265,
+  },
 });
 
 class Dashboard extends React.Component {
@@ -56,6 +74,7 @@ class Dashboard extends React.Component {
     authenticated: false,
     drawerOpen: false,
     createNewOrganisation: false,
+    currentUserId: 0,
     newOrganisationName: '',
     newOrganisationHourly: 0,
     currentOrganisationId: 0,
@@ -127,6 +146,7 @@ class Dashboard extends React.Component {
         .then((response) => {
           if (response.error === undefined) {
             this.setState({
+              currentUserId: response.id,
               currentOrganisationId: response.organisationId,
             });
           } else {
@@ -216,9 +236,9 @@ class Dashboard extends React.Component {
     });
   };
 
-  handleLeaveAndJoinOrganisation = (event, organisationToJoinId) => {
+  handleJoinOrganisation = (event, organisationToJoinId) => {
     event.preventDefault();
-    event.stopPropagation();
+    event.persist();
 
     const { cookies } = this.props;
 
@@ -238,7 +258,8 @@ class Dashboard extends React.Component {
             this.setState({
               currentOrganisationId: response.id,
             });
-            this.componentDidMount();
+            this.getCurrentOrganisationId();
+            this.getOrganisations();
             this.handleDrawer(event);
             this.handleSnackBarOpen(`Joined ${response.name}`);
           })
@@ -277,7 +298,8 @@ class Dashboard extends React.Component {
                 newOrganisationHourly: 0,
                 createNewOrganisation: false,
               });
-              this.componentDidMount();
+              this.getCurrentOrganisationId();
+              this.getOrganisations();
             } else {
               this.handleSnackBarOpen(response.error);
             }
@@ -317,7 +339,8 @@ class Dashboard extends React.Component {
               editOrganisation: false,
               editOrganisationId: 0,
             });
-            this.componentDidMount();
+            this.getCurrentOrganisationId();
+            this.getOrganisations();
           } else {
             this.handleSnackBarOpen(response.error);
           }
@@ -326,6 +349,13 @@ class Dashboard extends React.Component {
       })();
     }
   };
+
+  handleLeaveOrganisation() {
+    this.setState({
+      currentOrganisationId: 0,
+    });
+    this.getCurrentOrganisationId();
+  }
 
   render() {
     const { classes } = this.props;
@@ -355,34 +385,32 @@ class Dashboard extends React.Component {
       createOrganisation = (
         <Paper className={classes.paper}>
           <TextField
-            className={classes.input}
+            className={classes.menuInput}
             id="outlined-name"
             label="Organisation Name"
             margin="normal"
             onChange={this.handleNewOrganisationNameChange}
-            fullWidth
           />
           <TextField
-            className={classes.input}
+            className={classes.menuInput}
             id="outlined-rate"
             label="Hourly Rate"
             margin="normal"
             onChange={this.handleNewOrganisationHourlyChange}
-            fullWidth
           />
-          <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleSaveNewOrganisation}>
+          <IconButton className={classes.menuSmallButtons} aria-label="Menu" onClick={this.handleSaveNewOrganisation}>
             <Save />
           </IconButton>
-          <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleCreateNewOrganisation}>
+          <IconButton className={classes.menuSmallButtons} aria-label="Menu" onClick={this.handleCreateNewOrganisation}>
             <Cancel />
           </IconButton>
         </Paper>
       );
     } else {
       createOrganisation = (
-        <div>
-          <IconButton className={classes.menuButton} aria-label="Menu" onClick={this.handleCreateNewOrganisation}>
-            <AddCircle />
+        <div className={classes.menuText}>
+          <IconButton className={classes.menuText} aria-label="Menu" onClick={this.handleCreateNewOrganisation}>
+            <AddCircle className={classes.menuText} />
           </IconButton>
         </div>
       );
@@ -420,14 +448,14 @@ class Dashboard extends React.Component {
                                     fullWidth
                                   />
                                   <IconButton
-                                    className={classes.menuButton}
+                                    className={classes.menuSmallButtons}
                                     aria-label="Menu"
                                     onClick={this.handleUpdateOrganisation}
                                   >
                                     <Save />
                                   </IconButton>
                                   <IconButton
-                                    className={classes.menuButton}
+                                    className={classes.menuSmallButtons}
                                     aria-label="Menu"
                                     onClick={this.handleOrganisationEditor}
                                   >
@@ -435,26 +463,31 @@ class Dashboard extends React.Component {
                                   </IconButton>
                                 </div>
                                 ) : (
-                                  <div>
-                                    <ListItemText
-                                      primary={organisation.name}
-                                      secondary={`$${organisation.hourlyRate} p/h`}
-                                    />
-                                    <IconButton
-                                      className={classes.menuButton}
-                                      aria-label="Menu"
-                                      onClick={event => this.handleOrganisationEditor(event,
-                                        organisation.id)}
-                                    >
-                                      { isHovering ? <Edit /> : null }
-                                    </IconButton>
-                                    <IconButton className={classes.menuButton} aria-label="Menu">
-                                      { isHovering
-                                      && (this.state.currentOrganisationId === organisation.id)
-                                        ? <Delete /> : null }
-                                    </IconButton>
-                                  </div>
+                                  <Grid container direction="row">
+                                    <Grid item>
+                                      <ListItemText
+                                        primary={organisation.name}
+                                        secondary={`$${organisation.hourlyRate} p/h`}
+                                        className={classes.menuItem}
+                                      />
+                                    </Grid>
+                                    <Grid item>
+                                      { isHovering && organisation.id
+                                      === this.state.currentOrganisationId ? (
+                                        <IconButton
+                                          className={classes.menuButton}
+                                          aria-label="Menu"
+                                          onClick={event => this.handleOrganisationEditor(event,
+                                            organisation.id)}
+                                        >
+                                          <Edit />
+                                        </IconButton>
+                                        ) : null }
+                                    </Grid>
+                                  </Grid>
                                 )
+
+
                              }
                             </ListItem>
                           )}
@@ -474,11 +507,15 @@ class Dashboard extends React.Component {
                 selected={organisation.id
                 === this.state.currentOrganisationId}
                 key={organisation.id}
-                onClick={event => this.handleLeaveAndJoinOrganisation(event,
+                onClick={event => this.handleJoinOrganisation(event,
                   organisation.id)}
               >
                 <ListItemIcon><Work /></ListItemIcon>
-                <ListItemText primary={organisation.name} secondary={`$${organisation.hourlyRate} p/h`} />
+                <ListItemText
+                  primary={organisation.name}
+                  secondary={`$${organisation.hourlyRate} p/h`}
+                  className={classes.menuItem}
+                />
 
               </ListItem>
 
@@ -490,12 +527,11 @@ class Dashboard extends React.Component {
 
     const drawerContents = (
       <div className={classes.list}>
-        <Typography variant="h6" color="inherit" className={classes.grow}>
+        <Typography variant="h5" className={classes.menuText}>
           Organisations
         </Typography>
         <Divider />
         {listItems}
-        <Divider />
         {createOrganisation}
       </div>
     );
@@ -524,7 +560,12 @@ class Dashboard extends React.Component {
             {drawerContents}
           </div>
         </Drawer>
-        <Shifts />
+        <Shifts
+          currentUserId={this.state.currentUserId}
+          currentOrganisationId={this.state.currentOrganisationId}
+          organisations={this.state.organisations}
+          leaveOrganisation={this.handleLeaveOrganisation.bind(this)}
+        />
 
         <Snackbar
           anchorOrigin={{
