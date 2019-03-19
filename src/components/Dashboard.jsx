@@ -21,12 +21,11 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import TextField from '@material-ui/core/TextField/TextField';
 import Paper from '@material-ui/core/Paper';
-import Snackbar from '@material-ui/core/Snackbar/Snackbar';
-import CloseIcon from '@material-ui/icons/Close';
 import ReactHoverObserver from 'react-hover-observer';
 import Edit from '@material-ui/icons/Edit';
 import Grid from '@material-ui/core/Grid';
 import Shifts from './Shifts';
+import PopUp from './PopUp';
 
 const styles = theme => ({
   root: {
@@ -567,29 +566,10 @@ class Dashboard extends React.Component {
           leaveOrganisation={this.handleLeaveOrganisation.bind(this)}
         />
 
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={this.state.error}
-          autoHideDuration={3000}
-          onClose={this.handleSnackBarClose}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id">{this.state.errorMsg}</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              className={classes.close}
-              onClick={this.handleSnackBarClose}
-            >
-              <CloseIcon />
-            </IconButton>,
-          ]}
+        <PopUp
+          error={this.state.error}
+          errorMsg={this.state.errorMsg}
+          handleSnackBarClose={this.handleSnackBarClose.bind(this)}
         />
       </div>
     );

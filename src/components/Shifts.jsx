@@ -18,10 +18,9 @@ import Save from '@material-ui/icons/Save';
 import Delete from '@material-ui/icons/Delete';
 import Cancel from '@material-ui/icons/Cancel';
 import moment from 'moment/src/moment';
-import Snackbar from '@material-ui/core/Snackbar';
-import CloseIcon from '@material-ui/icons/Close';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import Grid from '@material-ui/core/Grid';
+import PopUp from './PopUp';
 
 const styles = theme => ({
   root: {
@@ -644,30 +643,10 @@ class Shifts extends React.Component {
     return (
       <div key={this.state.shifts}>
         {shiftTable}
-
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={this.state.error}
-          autoHideDuration={3000}
-          onClose={this.handleSnackBarClose}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id">{this.state.errorMsg}</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              className={classes.close}
-              onClick={this.handleSnackBarClose}
-            >
-              <CloseIcon />
-            </IconButton>,
-          ]}
+        <PopUp
+          error={this.state.error}
+          errorMsg={this.state.errorMsg}
+          handleSnackBarClose={this.handleSnackBarClose.bind(this)}
         />
       </div>
     );

@@ -19,9 +19,8 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField/TextField';
-import Snackbar from '@material-ui/core/Snackbar/Snackbar';
-import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
+import PopUp from './PopUp';
 
 const styles = theme => ({
   root: {
@@ -532,30 +531,12 @@ class Account extends React.Component {
           </Grid>
         </Slide>
 
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={this.state.error}
-          autoHideDuration={3000}
-          onClose={this.handleSnackBarClose}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id">{this.state.errorMsg}</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              className={classes.close}
-              onClick={this.handleSnackBarClose}
-            >
-              <CloseIcon />
-            </IconButton>,
-          ]}
+        <PopUp
+          error={this.state.error}
+          errorMsg={this.state.errorMsg}
+          handleSnackBarClose={this.handleSnackBarClose.bind(this)}
         />
+
       </div>
 
     );

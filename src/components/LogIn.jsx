@@ -11,9 +11,7 @@ import Grid from '@material-ui/core/Grid/Grid';
 import Switch from '@material-ui/core/Switch/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import FormGroup from '@material-ui/core/FormGroup/FormGroup';
-import CloseIcon from '@material-ui/icons/Close';
-import Snackbar from '@material-ui/core/Snackbar/Snackbar';
-import IconButton from '@material-ui/core/IconButton/IconButton';
+import PopUp from './PopUp';
 
 const styles = theme => ({
   root: {
@@ -310,30 +308,12 @@ class LogIn extends React.Component {
           </Grid>
         </Grid>
 
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={this.state.error}
-          autoHideDuration={3000}
-          onClose={this.handleSnackBarClose}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id">{this.state.errorMsg}</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              className={classes.close}
-              onClick={this.handleSnackBarClose}
-            >
-              <CloseIcon />
-            </IconButton>,
-          ]}
+        <PopUp
+          error={this.state.error}
+          errorMsg={this.state.errorMsg}
+          handleSnackBarClose={this.handleSnackBarClose.bind(this)}
         />
+
       </Grid>
     );
   }

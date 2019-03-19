@@ -7,10 +7,8 @@ import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField/TextField';
 import Grid from '@material-ui/core/Grid/Grid';
-import CloseIcon from '@material-ui/icons/Close';
-import Snackbar from '@material-ui/core/Snackbar/Snackbar';
-import IconButton from '@material-ui/core/IconButton/IconButton';
 import withStyles from '@material-ui/core/es/styles/withStyles';
+import PopUp from './PopUp';
 
 const styles = theme => ({
   root: {
@@ -273,30 +271,10 @@ class SignUp extends React.Component {
             </Grid>
           </Grid>
         </Grid>
-
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={this.state.error}
-          autoHideDuration={3000}
-          onClose={this.handleSnackBarClose}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id">{this.state.errorMsg}</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              className={classes.close}
-              onClick={this.handleSnackBarClose}
-            >
-              <CloseIcon />
-            </IconButton>,
-          ]}
+        <PopUp
+          error={this.state.error}
+          errorMsg={this.state.errorMsg}
+          handleSnackBarClose={this.handleSnackBarClose.bind(this)}
         />
       </Grid>
     );
