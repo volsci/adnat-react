@@ -426,8 +426,8 @@ class Shifts extends React.Component {
    * The shift input fields are checked to be valid, that the datetimes are in
    * a recognisable format and that the start and finish timing is not illogical (no time travel!).
    * The break length is also checked for being not negative, and that it is not greater
-   * than the actual time worked. The break length input field by nature does not allow for non-numbers,
-   * so that is not validated here.
+   * than the actual time worked. The break length input field by nature does not allow for
+   * non-numbers, so that is not validated here.
    */
   validateNewShift(start, finish, breakLength) {
     if (start._i === 'Invalid date' || finish._i === 'Invalid date') {
