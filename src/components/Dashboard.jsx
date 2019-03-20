@@ -67,6 +67,11 @@ const styles = theme => ({
   },
 });
 
+/**
+ * Component containing the major functionality of the application. The dashboard
+ * comprises of an app bar, a side drawer menu, and the shifts table, a child
+ * component that receives its props.
+ */
 class Dashboard extends React.Component {
   state = {
     toAccount: false,
@@ -107,6 +112,9 @@ class Dashboard extends React.Component {
     }
   }
 
+  /**
+   * Retrieves from the database all existing organisations, in the form of objects.
+   */
   getOrganisations() {
     const { cookies } = this.props;
 
@@ -131,6 +139,9 @@ class Dashboard extends React.Component {
     })();
   }
 
+  /**
+   * Retrieves from the database the current user's id and organisation id.
+   */
   getCurrentOrganisationId() {
     const { cookies } = this.props;
 
@@ -235,6 +246,10 @@ class Dashboard extends React.Component {
     });
   };
 
+  /**
+   * If the user does not currently belong to an organisation, they are inducted
+   * into a new one.
+   */
   handleJoinOrganisation = (event, organisationToJoinId) => {
     event.preventDefault();
     event.persist();
@@ -267,17 +282,15 @@ class Dashboard extends React.Component {
     }
   };
 
+  /**
+   * If the input is validated, it is saved into the database as a new organisation.
+   */
   handleSaveNewOrganisation = (event) => {
     event.preventDefault();
     const { cookies } = this.props;
 
-    if (this.state.newOrganisationName === '') {
-      this.handleSnackBarOpen('Please provide a name');
-    } else if (Number.isNaN(parseInt(this.state.newOrganisationHourly, 10)) === true) {
-      this.handleSnackBarOpen('Hourly rate must be a number');
-    } else if (parseInt(this.state.newOrganisationHourly, 10) < 1) {
-      this.handleSnackBarOpen('Hourly rate must be greater than 0');
-    } else {
+    if (this.validateNewOrganisation(this.state.newOrganisationName,
+      this.state.newOrganisationHourly) === true) {
       (async () => {
         await fetch('http://localhost:3000/organisations/create_join', {
           headers: {
@@ -308,17 +321,15 @@ class Dashboard extends React.Component {
     }
   };
 
+  /**
+   * If the input is validated, it is saved into a pre-existing organisation.
+   */
   handleUpdateOrganisation = (event) => {
     event.preventDefault();
     const { cookies } = this.props;
 
-    if (this.state.editedOrganisationName === '') {
-      this.handleSnackBarOpen('Please provide a name');
-    } else if (Number.isNaN(parseInt(this.state.editedOrganisationHourly, 10)) === true) {
-      this.handleSnackBarOpen('Hourly rate must be a number');
-    } else if (parseInt(this.state.editedOrganisationHourly, 10) < 1) {
-      this.handleSnackBarOpen('Hourly rate must be greater than 0');
-    } else {
+    if (this.validateNewOrganisation(this.state.newOrganisationName,
+      this.state.newOrganisationHourly) === true) {
       (async () => {
         await fetch(`http://localhost:3000/organisations/${this.state.editOrganisationId}`, {
           headers: {
@@ -356,6 +367,20 @@ class Dashboard extends React.Component {
     this.getCurrentOrganisationId();
   }
 
+  validateNewOrganisation(newOrganisationName, newOrganisationHourly) {
+    if (newOrganisationName === '') {
+      this.handleSnackBarOpen('Please provide a name');
+      return false;
+    } if (Number.isNaN(parseInt(newOrganisationHourly, 10)) === true) {
+      this.handleSnackBarOpen('Hourly rate must be a number');
+      return false;
+    } if (parseInt(newOrganisationHourly, 10) < 1) {
+      this.handleSnackBarOpen('Hourly rate must be greater than 0');
+      return false;
+    }
+    return true;
+  }
+
   render() {
     const { classes } = this.props;
 
@@ -378,6 +403,11 @@ class Dashboard extends React.Component {
       return <Redirect to="/" />;
     }
 
+    /**
+     * If the user already members in an organisation, the create organisation button
+     * is hidden. If the button is clicked, a form of input fields is rendered
+     * allowing the user to proceed in creating a new organisation.
+     */
     if (this.state.currentOrganisationId > 0) {
       createOrganisation = <div />;
     } else if (this.state.createNewOrganisation === true) {
@@ -415,6 +445,16 @@ class Dashboard extends React.Component {
       );
     }
 
+    /**
+     * The functionality surrounding the list of organisations in the drawer menu
+     * differs slightly on whether or not the user members in an organisation. If
+     * they do not, they may click on any organisation to join it. If they do, their
+     * current organisation will be selected, and they will not be able to click on
+     * other organisations. Instead, upon hovering their mouse over their organisation,
+     * an edit icon will appear allowing the user to render a form of input fields
+     * allowing them to change the organisation details. This only applies to the
+     * user's organisation and no other.
+     */
     if (this.state.currentOrganisationId > 0) {
       listItems = (
         <List>
@@ -554,7 +594,6 @@ class Dashboard extends React.Component {
           <div
             tabIndex={0}
             role="button"
-            // onKeyDown={this.handleDrawer}
           >
             {drawerContents}
           </div>
