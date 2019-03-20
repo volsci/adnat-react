@@ -9,6 +9,7 @@ import TextField from '@material-ui/core/TextField/TextField';
 import Grid from '@material-ui/core/Grid/Grid';
 import withStyles from '@material-ui/core/es/styles/withStyles';
 import PopUp from './PopUp';
+import adnat from '../../public/adnat.png';
 
 const styles = theme => ({
   root: {
@@ -38,6 +39,10 @@ const styles = theme => ({
     margin: theme.spacing.unit,
     marginLeft: 'auto',
     width: '100%',
+  },
+  adnat: {
+    marginTop: theme.spacing.unit * 2,
+    textAlign: 'center',
   },
 });
 
@@ -207,89 +212,93 @@ class SignUp extends React.Component {
     }
 
     return (
-      <Grid container className={classes.root}>
-        <Grid item xs={12}>
-          <Grid
-            container
-            spacing={8}
-            className={classes.demo}
-            alignItems="center"
-            justify="center"
-          >
-            <Grid item>
-              <Card className={classes.card}>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-name"
-                    label="Name"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.name}
-                    onChange={this.handleNameInput}
-                    fullWidth
-                  />
-                </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-email-input"
-                    label="Email"
-                    type="email"
-                    name="email"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.email}
-                    onChange={this.handleEmailInput}
-                    fullWidth
-                  />
-                </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-password-input"
-                    label="Password"
-                    type="password"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.password}
-                    onChange={this.handlePasswordInput}
-                    fullWidth
-                  />
-                </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-passwordConfirmation-input"
-                    label="Confirm Password"
-                    type="password"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.passwordConfirmation}
-                    onChange={this.handlePasswordConfirmationInput}
-                    fullWidth
-                  />
-                </CardActions>
-                <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.forgotPassword} fullWidth onClick={this.handleSignUp}>
+      <div className={classes.adnat}>
+        <img src={adnat} alt="" />
+        <Grid container className={classes.root}>
+          <Grid item xs={12}>
+            <Grid
+              container
+              spacing={8}
+              className={classes.demo}
+              alignItems="center"
+              justify="center"
+              direction="column"
+            >
+              <Grid item>
+                <Card className={classes.card}>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-name"
+                      label="Name"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.name}
+                      onChange={this.handleNameInput}
+                      fullWidth
+                    />
+                  </CardActions>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-email-input"
+                      label="Email"
+                      type="email"
+                      name="email"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.email}
+                      onChange={this.handleEmailInput}
+                      fullWidth
+                    />
+                  </CardActions>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-password-input"
+                      label="Password"
+                      type="password"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.password}
+                      onChange={this.handlePasswordInput}
+                      fullWidth
+                    />
+                  </CardActions>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-passwordConfirmation-input"
+                      label="Confirm Password"
+                      type="password"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.passwordConfirmation}
+                      onChange={this.handlePasswordConfirmationInput}
+                      fullWidth
+                    />
+                  </CardActions>
+                  <CardActions disableActionSpacing>
+                    <Button variant="contained" color="secondary" className={classes.forgotPassword} fullWidth onClick={this.handleSignUp}>
                     Sign Up
-                  </Button>
-                </CardActions>
-                <CardActions disableActionSpacing>
-                  <Button variant="contained" className={classes.forgotPassword} fullWidth onClick={this.handleBack}>
+                    </Button>
+                  </CardActions>
+                  <CardActions disableActionSpacing>
+                    <Button variant="contained" className={classes.forgotPassword} fullWidth onClick={this.handleBack}>
                     Back
-                  </Button>
-                </CardActions>
-              </Card>
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Grid>
             </Grid>
           </Grid>
+          <PopUp
+            error={this.state.error}
+            errorMsg={this.state.errorMsg}
+            handleSnackBarClose={this.handleSnackBarClose.bind(this)}
+          />
         </Grid>
-        <PopUp
-          error={this.state.error}
-          errorMsg={this.state.errorMsg}
-          handleSnackBarClose={this.handleSnackBarClose.bind(this)}
-        />
-      </Grid>
+      </div>
     );
   }
 }

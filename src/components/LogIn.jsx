@@ -12,6 +12,7 @@ import Switch from '@material-ui/core/Switch/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import FormGroup from '@material-ui/core/FormGroup/FormGroup';
 import PopUp from './PopUp';
+import adnat from '../../public/adnat.png';
 
 const styles = theme => ({
   root: {
@@ -44,6 +45,10 @@ const styles = theme => ({
     margin: theme.spacing.unit,
     marginLeft: 'auto',
     width: '100%',
+  },
+  adnat: {
+    marginTop: theme.spacing.unit * 2,
+    textAlign: 'center',
   },
 });
 
@@ -234,97 +239,101 @@ class LogIn extends React.Component {
     }
 
     return (
-      <Grid container className={classes.root}>
-        <Grid item xs={12}>
-          <Grid
-            container
-            spacing={8}
-            className={classes.demo}
-            alignItems="center"
-            justify="center"
-          >
-            <Grid item>
-              <Card className={classes.card}>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-email-input"
-                    label="Email"
-                    type="email"
-                    name="email"
-                    autoComplete="email"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.email}
-                    onChange={this.handleEmailInput}
-                  />
-                </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-password-input"
-                    label="Password"
-                    type="password"
-                    autoComplete="current-password"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.password}
-                    onChange={this.handlePasswordInput}
-                  />
-                </CardActions>
-                <CardActions>
-                  <Grid container spacing={24}>
-                    <Grid item xs={6}>
-                      <FormGroup row>
-                        <FormControlLabel
-                          className={classes.accountHandlers}
-                          control={(
-                            <Switch
-                              checked={this.state.rememberMe}
-                              onChange={this.handleChange('rememberMe')}
-                              value="rememberMe"
-                            />
+      <div className={classes.adnat}>
+        <img src={adnat} alt="" />
+        <Grid container className={classes.root}>
+          <Grid item xs={12}>
+            <Grid
+              container
+              spacing={8}
+              className={classes.demo}
+              alignItems="center"
+              justify="center"
+              direction="column"
+            >
+              <Grid item>
+                <Card className={classes.card}>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-email-input"
+                      label="Email"
+                      type="email"
+                      name="email"
+                      autoComplete="email"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.email}
+                      onChange={this.handleEmailInput}
+                    />
+                  </CardActions>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-password-input"
+                      label="Password"
+                      type="password"
+                      autoComplete="current-password"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.password}
+                      onChange={this.handlePasswordInput}
+                    />
+                  </CardActions>
+                  <CardActions>
+                    <Grid container spacing={24}>
+                      <Grid item xs={6}>
+                        <FormGroup row>
+                          <FormControlLabel
+                            className={classes.accountHandlers}
+                            control={(
+                              <Switch
+                                checked={this.state.rememberMe}
+                                onChange={this.handleChange('rememberMe')}
+                                value="rememberMe"
+                              />
                           )}
-                          label="Remember Me"
-                        />
-                      </FormGroup>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Button
-                        className={classes.accountHandlers}
-                        onClick={this.handleForgotPassword}
-                      >
+                            label="Remember Me"
+                          />
+                        </FormGroup>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button
+                          className={classes.accountHandlers}
+                          onClick={this.handleForgotPassword}
+                        >
                         Forgot Password
-                      </Button>
+                        </Button>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </CardActions>
-                <CardActions disableActionSpacing>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    className={classes.forgotPassword}
-                    onClick={this.handleLogin}
-                  >
+                  </CardActions>
+                  <CardActions disableActionSpacing>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      className={classes.forgotPassword}
+                      onClick={this.handleLogin}
+                    >
                     Log In
-                  </Button>
+                    </Button>
 
-                </CardActions>
-              </Card>
-              <Button className={classes.signUp} onClick={this.handleSignUp}>
-                {"Don't have an account yet? Sign Up"}
-              </Button>
+                  </CardActions>
+                </Card>
+                <Button className={classes.signUp} onClick={this.handleSignUp}>
+                  {"Don't have an account yet? Sign Up"}
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
+
+          <PopUp
+            error={this.state.error}
+            errorMsg={this.state.errorMsg}
+            handleSnackBarClose={this.handleSnackBarClose.bind(this)}
+          />
+
         </Grid>
-
-        <PopUp
-          error={this.state.error}
-          errorMsg={this.state.errorMsg}
-          handleSnackBarClose={this.handleSnackBarClose.bind(this)}
-        />
-
-      </Grid>
+      </div>
     );
   }
 }
