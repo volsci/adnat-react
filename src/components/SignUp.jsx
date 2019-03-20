@@ -57,7 +57,7 @@ class SignUp extends React.Component {
     authenticated: false,
   };
 
-  componentWillMount() {
+  componentDidMount() {
     const { cookies } = this.props;
 
     if (JSON.stringify(cookies.get('sessionId')) === undefined) {
@@ -126,16 +126,10 @@ class SignUp extends React.Component {
   handleSignUp = (event) => {
     event.preventDefault();
 
-    if (this.state.name === ''
-      || this.state.email === ''
-      || this.state.password === ''
-      || this.state.passwordConfirmation === '') {
-      this.handleSnackBarOpen('Please provide all of the required details');
-    } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen('Please provide a valid email address');
-    } else if (this.state.password.length < 6) {
-      this.handleSnackBarOpen('Please enter a password with six characters or more');
-    } else {
+    if (this.validateSignUp(this.state.name,
+      this.state.email,
+      this.state.password,
+      this.state.passwordConfirmation) === true) {
       (async () => {
         await fetch('http://localhost:3000/auth/signUp', {
           headers: {
@@ -152,9 +146,7 @@ class SignUp extends React.Component {
         }).then(res => res.json())
           .then((response) => {
             if (response.error === undefined) {
-              this.handleSnackBarOpen('Success! Account created, please log in with your provided details');
               this.saveCookie(response.sessionId);
-
               this.setState({
                 authenticated: true,
               });
@@ -174,6 +166,27 @@ class SignUp extends React.Component {
       toLogIn: true,
     });
   };
+
+  /**
+   * Check that all the sign up fields have been supplied, that the email is valid,
+   * and that the password is six characters or more.
+   */
+  validateSignUp(name, email, password, passwordConfirmation) {
+    if (name === ''
+      || email === ''
+      || password === ''
+      || passwordConfirmation === '') {
+      this.handleSnackBarOpen('Please provide all of the required details');
+      return false;
+    } if (!email.includes('@')) {
+      this.handleSnackBarOpen('Please provide a valid email address');
+      return false;
+    } if (password.length < 6) {
+      this.handleSnackBarOpen('Please enter a password with six characters or more');
+      return false;
+    }
+    return true;
+  }
 
   render() {
     const { classes } = this.props;

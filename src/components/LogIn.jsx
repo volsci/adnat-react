@@ -66,7 +66,7 @@ class LogIn extends React.Component {
     authenticated: false,
   };
 
-  componentWillMount() {
+  componentDidMount() {
     const { cookies } = this.props;
 
     if (JSON.stringify(cookies.get('sessionId')) === undefined) {
@@ -149,11 +149,7 @@ class LogIn extends React.Component {
   handleLogin = (event) => {
     event.preventDefault();
 
-    if (this.state.email === '' || this.state.password === '') {
-      this.handleSnackBarOpen('Please enter your email address and password');
-    } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen('Please provide a valid email address');
-    } else {
+    if (this.validateLogIn(this.state.email, this.state.password) === true) {
       (async () => {
         await fetch('http://localhost:3000/auth/login', {
           headers: {
@@ -188,6 +184,20 @@ class LogIn extends React.Component {
       toSignUp: true,
     });
   };
+
+  /**
+   * Check if the fields are empty, and check if the email is valid.
+   */
+  validateLogIn(email, password) {
+    if (email === '' || password === '') {
+      this.handleSnackBarOpen('Please enter your email address and password');
+      return false;
+    } if (!email.includes('@')) {
+      this.handleSnackBarOpen('Please provide a valid email address');
+      return false;
+    }
+    return true;
+  }
 
   render() {
     const { classes } = this.props;

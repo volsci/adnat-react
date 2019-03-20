@@ -55,7 +55,7 @@ class ForgotPassword extends React.Component {
 
   };
 
-  componentWillMount() {
+  componentDidMount() {
     const { cookies } = this.props;
 
     if (JSON.stringify(cookies.get('sessionId')) === undefined) {
@@ -98,11 +98,7 @@ class ForgotPassword extends React.Component {
   handleEmailPassword = (event) => {
     event.preventDefault();
 
-    if (this.state.email === '') {
-      this.handleSnackBarOpen('Please enter your email address');
-    } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen('Please provide a valid email address');
-    } else {
+    if (this.validateForgotPassword(this.state.email) === true) {
       this.setState({
         email: '',
       });
@@ -117,6 +113,20 @@ class ForgotPassword extends React.Component {
       toLogIn: true,
     });
   };
+
+  /**
+   * Check if the field is empty, and check if the email is valid.
+   */
+  validateForgotPassword(email) {
+    if (email === '') {
+      this.handleSnackBarOpen('Please enter your email address');
+      return false;
+    } if (!email.includes('@')) {
+      this.handleSnackBarOpen('Please provide a valid email address');
+      return false;
+    }
+    return true;
+  }
 
   render() {
     const { classes } = this.props;

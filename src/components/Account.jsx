@@ -103,6 +103,9 @@ class Account extends React.Component {
   componentDidMount() {
     const { cookies } = this.props;
 
+    /**
+     * Retrieves the current user's information from the database.
+     */
     if (this.state.authenticated === true) {
       (async () => {
         await fetch('http://localhost:3000/users/me', {
@@ -174,6 +177,9 @@ class Account extends React.Component {
 
     this.setState({
       editPassword: !this.state.editPassword,
+      oldPassword: '',
+      editedPassword: '',
+      editedPasswordConfirmation: '',
     });
   };
 
@@ -201,6 +207,9 @@ class Account extends React.Component {
     });
   };
 
+  /**
+   * If validated successfully, the user's name is updated.
+   */
   handleUpdateName = (event) => {
     event.preventDefault();
     const { cookies } = this.props;
@@ -235,15 +244,14 @@ class Account extends React.Component {
     }
   };
 
+  /**
+   * If validated successfully, the user's email is updated.
+   */
   handleUpdateEmail = (event) => {
     event.preventDefault();
     const { cookies } = this.props;
 
-    if (this.state.editedEmail === '') {
-      this.handleSnackBarOpen('Please enter your email address');
-    } else if (!this.state.editedEmail.includes('@')) {
-      this.handleSnackBarOpen('Please provide a valid email address');
-    } else {
+    if (this.validateUpdateEmail(this.state.editedEmail) === true) {
       (async () => {
         await fetch('http://localhost:3000/users/me', {
           headers: {
@@ -261,7 +269,7 @@ class Account extends React.Component {
                 email: this.state.editedEmail,
                 editEmail: false,
               });
-              this.handleSnackBarOpen('Email Updated Successfully');
+              this.handleSnackBarOpen('Email updated successfully');
             } else {
               console.log(response.error);
             }
@@ -271,17 +279,16 @@ class Account extends React.Component {
     }
   };
 
+  /**
+   * If validated successfully, the user's password is updated.
+   */
   handleUpdatePassword = (event) => {
     event.preventDefault();
     const { cookies } = this.props;
 
-    if (this.state.editedPassword === ''
-      || this.state.editedPasswordConfirmation === ''
-      || this.state.oldPassword === '') {
-      this.handleSnackBarOpen('Please enter all required password information');
-    } else if (this.state.editedPassword.length < 6) {
-      this.handleSnackBarOpen('Please enter a password with six characters or more');
-    } else {
+    if (this.validateUpdatePassword(this.state.oldPassword,
+      this.state.editedPassword,
+      this.state.editedPasswordConfirmation) === true) {
       (async () => {
         await fetch('http://localhost:3000/users/me/change_password', {
           headers: {
@@ -295,16 +302,16 @@ class Account extends React.Component {
             newPasswordConfirmation: this.state.editedPasswordConfirmation,
           }),
         }).then((response) => {
-          if (response.error === undefined) {
+          if (response.ok === true) {
             this.setState({
               editPassword: false,
               oldPassword: '',
               editedPassword: '',
               editedPasswordConfirmation: '',
             });
-            this.handleSnackBarOpen('Password Updated Successfully');
+            this.handleSnackBarOpen('Password updated successfully');
           } else {
-            this.handleSnackBarOpen(response.error);
+            this.handleSnackBarOpen('Current password incorrect');
           }
         })
           .catch(error => console.error('Error:', error));
@@ -312,6 +319,10 @@ class Account extends React.Component {
     }
   };
 
+  /**
+   * Logs the user out, deauthenticating them in the database and also deleting
+   * any cookies possessed.
+   */
   handleLogout = (event) => {
     event.preventDefault();
     const { cookies } = this.props;
@@ -351,6 +362,41 @@ class Account extends React.Component {
     });
   };
 
+  /**
+   * Check if the field is empty, and check if the email is valid.
+   */
+  validateUpdateEmail(email) {
+    if (email === '') {
+      this.handleSnackBarOpen('Please enter your email address');
+      return false;
+    } if (!email.includes('@')) {
+      this.handleSnackBarOpen('Please provide a valid email address');
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Check that all fields are supplied and check that the password is both six characters
+   * or more, and that confirmation matches. Whether or not the supplied current/old password
+   * is valid is handled by the database call itself, which will return an error.
+   */
+  validateUpdatePassword(oldPassword, editedPassword, editedPasswordConfirmation) {
+    if (editedPassword === ''
+      || editedPasswordConfirmation === ''
+      || oldPassword === '') {
+      this.handleSnackBarOpen('Please enter all required password information');
+      return false;
+    } if (editedPassword.length < 6) {
+      this.handleSnackBarOpen('Please enter a password with six characters or more');
+      return false;
+    } if (editedPassword !== editedPasswordConfirmation) {
+      this.handleSnackBarOpen('Password confirmation does not match');
+      return false;
+    }
+    return true;
+  }
+
   render() {
     const { classes } = this.props;
 
@@ -367,12 +413,16 @@ class Account extends React.Component {
     }
 
     /**
-     * If a session ID was not detected, the user is sent to the login page.
+     * If a session ID is not detected, the user is sent to the login page.
      */
     if (this.state.authenticated === false) {
       return <Redirect to="/" />;
     }
 
+    /**
+     * If the user is trying to edit their name, the component is rendered as a
+     * text field wherein they can input a new one.
+     */
     if (this.state.editName === true) {
       nameField = (
         <CardActions disableActionSpacing className={classes.cardAction}>
@@ -408,6 +458,10 @@ class Account extends React.Component {
       );
     }
 
+    /**
+     * If the user is trying to edit their email, the component is rendered as a
+     * text field wherein they can input a new one.
+     */
     if (this.state.editEmail === true) {
       emailField = (
         <CardActions disableActionSpacing className={classes.cardAction}>
@@ -443,6 +497,10 @@ class Account extends React.Component {
       );
     }
 
+    /**
+     * If the user is trying to edit their password, the component is rendered as a form
+     * of text fields where they can attempt to do so.
+     */
     if (this.state.editPassword === true) {
       passwordField = (
         <Grid item>
@@ -516,7 +574,6 @@ class Account extends React.Component {
         </AppBar>
 
         <Slide direction="up" in mountOnEnter unmountOnExit>
-
           <Grid container justify="center" alignItems="center" direction="column">
             <Grid item>
               <Avatar src="https://blogtimenow.com/wp-content/uploads/2014/06/hide-facebook-profile-picture-notification.jpg" className={classes.avatar} />
