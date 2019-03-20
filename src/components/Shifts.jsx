@@ -65,6 +65,10 @@ const styles = theme => ({
   },
 });
 
+/**
+ * This component produces a table of organisation-wide shifts, also housing
+ * functionality needed to create, deleted and update those shifts.
+ */
 class Shifts extends React.Component {
   state = {
     shifts: [],
@@ -109,6 +113,9 @@ class Shifts extends React.Component {
     }
   }
 
+  /**
+   * Retrieves a list from the database of all users in the current organisation.
+   */
   getCurrentOrganisationUsers() {
     const { cookies } = this.props;
 
@@ -131,6 +138,11 @@ class Shifts extends React.Component {
     })();
   }
 
+  /**
+   * A list of all organisations are received as a prop. The objects in this
+   * prop have their id checked against the current organisation id, and if
+   * the check passes the name and hourly rate is retrieved.
+   */
   getCurrentOrganisationDetails(organisations) {
     for (let i = 0; i < organisations.length; i += 1) {
       if (organisations[i].id === this.state.currentOrganisationId) {
@@ -142,6 +154,9 @@ class Shifts extends React.Component {
     }
   }
 
+  /**
+   * Retrieves a list from the database of all shifts in the organisation.
+   */
   getShifts() {
     const { cookies } = this.props;
 
@@ -185,6 +200,10 @@ class Shifts extends React.Component {
     });
   };
 
+  /**
+   * If validation passes, the user's input is saved to the database as a new
+   * shift.
+   */
   handleCreateNewShift = (event) => {
     event.preventDefault();
 
@@ -224,6 +243,10 @@ class Shifts extends React.Component {
     }
   };
 
+  /**
+   * If validation passes, the user's input is saved to the database updating
+   * the values of the pre-existing shift.
+   */
   handleUpdateShift = (event, shift) => {
     event.preventDefault();
 
@@ -259,6 +282,9 @@ class Shifts extends React.Component {
     }
   };
 
+  /**
+   * The supplied shift is deleted from the database.
+   */
   handleDeleteShift = (event, shift) => {
     event.preventDefault();
 
@@ -281,6 +307,12 @@ class Shifts extends React.Component {
     })();
   };
 
+  /**
+   * As the schema of the database does not allow for shifts to be matched to the
+   * organisation they were created in, when a user decides to leave the organisation
+   * all of their shifts are deleted. Once this is done, the user's association to
+   * the organisation is cleared.
+   */
   handleDeleteShiftsOnLeave = (event) => {
     event.preventDefault();
 
@@ -390,6 +422,13 @@ class Shifts extends React.Component {
     });
   };
 
+  /**
+   * The shift input fields are checked to be valid, that the datetimes are in
+   * a recognisable format and that the start and finish timing is not illogical (no time travel!).
+   * The break length is also checked for being not negative, and that it is not greater
+   * than the actual time worked. The break length input field by nature does not allow for non-numbers,
+   * so that is not validated here.
+   */
   validateNewShift(start, finish, breakLength) {
     if (start._i === 'Invalid date' || finish._i === 'Invalid date') {
       this.handleSnackBarOpen('Please enter valid shift start and finish times.');
@@ -407,6 +446,10 @@ class Shifts extends React.Component {
     return true;
   }
 
+  /**
+   * Matches user names to user id. This is needed because a shift in the database
+   * does not store the employee's name, only id.
+   */
   matchNames(shift) {
     for (let i = 0; i < this.state.currentOrganisationUsers.length; i += 1) {
       if (shift.userId === this.state.currentOrganisationUsers[i].id) {
@@ -415,6 +458,10 @@ class Shifts extends React.Component {
     }
   }
 
+  /**
+   * Matches shifts to the current user. This is needed when the user decides to
+   * leave the organisation.
+   */
   matchCurrentUserShifts(currentUserShifts) {
     for (let i = 0; i < this.state.shifts.length; i += 1) {
       if (this.state.shifts[i].userId === this.state.currentUserId) {
@@ -423,21 +470,44 @@ class Shifts extends React.Component {
     }
   }
 
+  /**
+   * Each shift is given a pay and time worked field, which is calculated
+   * using the start and finish times.
+   */
   calculateTimeAndPay(shift) {
+    /**
+     * Using moment.js, the datetime values are formatted into something more
+     * legible.
+     */
     const startFormat = moment(shift.start).format('llll');
     const finishFormat = moment(shift.finish).format('llll');
 
+    /**
+     * The formatted values are used to initialise moment objects, which can make use
+     * of library functions.
+     */
     const start = moment(startFormat);
     const finish = moment(finishFormat);
 
     const breakLength = parseInt(shift.breakLength, 10);
 
+    /**
+     * The diff function finds the difference between the two supplied datetimes,
+     * in the preferred format, and then the break length is subtracted from this figure.
+     * Common modular arithmetic is used to determine the time worked in hours and minutes.
+     */
     const totalMinutes = finish.diff(start, 'minutes') - breakLength;
     const hours = Math.floor(totalMinutes / 60);
     const minutes = Math.floor(totalMinutes % 60);
 
     shift.timeWorked = (`${hours} hours, ${minutes} minutes`);
 
+    /**
+     * An employee is usually paid every fifteen minutes, rather than every hour. In
+     * reality the system payroll uses to determine whether or not the employee
+     * has worked enough of that fifteen minute threshold to earn their quarter-wage,
+     * but this more basic operation suffices.
+     */
     const payThresholds = Math.floor(totalMinutes / 15);
     shift.pay = payThresholds * (this.state.currentOrganisationHourly / 4);
   }
@@ -571,6 +641,11 @@ class Shifts extends React.Component {
       </div>
     );
 
+    /**
+     * The shifts table is not loaded if the user is not part of an organisation.
+     * Instead, they are met with a generic splash screen and a prompt to join
+     * an organisation.
+     */
     if (this.state.currentOrganisationId < 1) {
       shiftTable = (
         <Grid container justify="center" alignItems="center" direction="column">
