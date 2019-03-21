@@ -56,7 +56,7 @@ const styles = theme => ({
   },
   icon: {
     marginTop: theme.spacing.unit * 10,
-    margin: theme.spacing.unit * 2,
+    marginRight: theme.spacing.unit * 2,
     width: 200,
     height: 200,
   },
@@ -90,10 +90,6 @@ class Shifts extends React.Component {
     errorMsg: '',
   };
 
-  componentDidMount() {
-    this.getCurrentOrganisationUsers();
-  }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.currentUserId !== this.props.currentUserId) {
       this.setState({
@@ -105,6 +101,7 @@ class Shifts extends React.Component {
       this.setState({
         currentOrganisationId: nextProps.currentOrganisationId,
       });
+      this.getCurrentOrganisationUsers();
     }
 
     if (nextProps.organisations !== this.props.organisations) {
@@ -129,9 +126,15 @@ class Shifts extends React.Component {
       }).then(res => res.json())
         .then((response) => {
           if (response.error === undefined) {
+            const tempUsers = [];
+
             for (let i = 0; i < response.length; i += 1) {
-              this.state.currentOrganisationUsers.push(response[i]);
+              tempUsers.push(response[i]);
             }
+
+            this.setState({
+              currentOrganisationUsers: tempUsers,
+            });
           }
         })
         .catch(error => console.error(`Error:${error}`));
@@ -520,6 +523,7 @@ class Shifts extends React.Component {
     const userPicker = (
       <FormControl fullWidth className={classes.textField}>
         <Select
+          key={this.state.currentOrganisationId}
           value={this.state.selectedUser}
           onChange={this.handleSelectUser}
           id="employee-simple"
