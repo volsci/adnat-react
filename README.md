@@ -47,6 +47,7 @@ Usage
 ---
 * Create a new account to begin with. Password must be six characters or more.
 * Create an organisation from the drawer menu to begin with. 
-* Shifts can be added for any employee. Double click an existing shift to edit or delete it. 
+* Shifts can be added for any employee. 
+* Double click an existing shift to edit or delete it. 
 * The current organisation's name or hourly rate can be changed by clicking on the pencil symbol that appears on hover, within the drawer menu.
 * Visit the account page to change name, email or password.
