@@ -22,7 +22,10 @@ npm start
 Test
 ---
 Adnat uses a test stack comprised of Jest, Enzyme and Cypress, covering unit, integration and E2E testing. Continuous integration is handled through Travis CI.
-
+```
+[in case of Windows related linebreak errors]
+eslint --fix src/**
+```
 ```
 npm test
 ```
