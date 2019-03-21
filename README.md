@@ -27,11 +27,13 @@ Adnat uses a test stack comprised of Jest, Enzyme and Cypress, covering unit, in
 npm test
 ```
 ```
+[while server is running]
 npm run cypress
 ```
 
 Details
 ---
+* Uses parceljs as the web application bundler
 * Uses the gitflow workflow / branching strategy.
 * Uses the Material UI component library.
 * Handles routing with react-router.
