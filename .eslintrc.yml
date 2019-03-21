@@ -13,4 +13,11 @@ parserOptions:
   sourceType: module
 plugins:
   - react
-rules: {}
+rules: {
+  react/destructuring-assignment: 0,
+  react/no-access-state-in-setstate: 0,
+  no-underscore-dangle: 0,
+  no-console: 0,
+  no-param-reassign: 0,
+  react/jsx-no-bind: 0
+}
