@@ -5,11 +5,11 @@ describe('Log in', () => {
 
   it('shows the correct buttons', () => {
     cy.get('button').should('have.length', 3);
-    cy.get(':nth-child(2) > .MuiButtonBase-root-218 > .MuiButton-label-258')
+    cy.get(':nth-child(2) > .MuiButtonBase-root-219')
       .contains('Forgot Password');
-    cy.get('.MuiCardActions-disableActionSpacing-135 > .MuiButtonBase-root-218 > .MuiButton-label-258')
+    cy.get('.MuiCardActions-disableActionSpacing-136')
       .contains('Log In');
-    cy.get('.LogIn-signUp-7 > .MuiButton-label-258')
+    cy.get('.LogIn-signUp-7')
       .contains('Don\'t have an account yet? Sign Up')
   });
 
@@ -24,21 +24,21 @@ describe('Log in', () => {
   });
 
   it('has a working remember me switch', () => {
-    cy.get(':nth-child(3) > .MuiGrid-container-9 > :nth-child(1)').should('have.length', 1)
+    cy.get('.MuiFormGroup-root-192')
       .contains('Remember Me');
 
-    cy.get('.MuiFormGroup-root-191')
+    cy.get('.MuiPrivateSwitchBase-input-212')
       .click()
   });
 
   it('has a working forgot password button', () => {
-    cy.get(':nth-child(2) > .MuiButtonBase-root-218 > .MuiButton-label-258')
+    cy.get(':nth-child(2) > .MuiButtonBase-root-219')
       .click()
       .location('pathname').should('eq', '/forgotpass')
   });
 
   it('has a working sign up button', () => {
-    cy.get('.LogIn-signUp-7 > .MuiButton-label-258')
+    cy.get('.LogIn-signUp-7')
       .click()
       .location('pathname').should('eq', '/signup')
   });
@@ -50,18 +50,18 @@ describe('Log in', () => {
     cy.get('#outlined-password-input')
       .type('foo');
 
-    cy.get('.MuiCardActions-disableActionSpacing-135')
+    cy.get('.MuiCardActions-disableActionSpacing-136')
       .click();
 
-    cy.get('.MuiSnackbar-root-283 > .MuiTypography-root-221')
+    cy.get('.MuiSnackbar-root-284 > .MuiTypography-root-222')
       .should('have.length', 1);
   });
 
   it('catches empty strings', () => {
-    cy.get('.MuiCardActions-disableActionSpacing-135')
+    cy.get('.MuiCardActions-disableActionSpacing-136')
       .click();
 
-    cy.get('.MuiSnackbar-root-283 > .MuiTypography-root-221')
+    cy.get('.MuiSnackbar-root-284 > .MuiTypography-root-222')
       .should('have.length', 1);
   });
 });
