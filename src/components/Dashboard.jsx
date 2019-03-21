@@ -328,8 +328,8 @@ class Dashboard extends React.Component {
     event.preventDefault();
     const { cookies } = this.props;
 
-    if (this.validateNewOrganisation(this.state.newOrganisationName,
-      this.state.newOrganisationHourly) === true) {
+    if (this.validateNewOrganisation(this.state.editedOrganisationName,
+      this.state.editedOrganisationHourly) === true) {
       (async () => {
         await fetch(`http://localhost:3000/organisations/${this.state.editOrganisationId}`, {
           headers: {
