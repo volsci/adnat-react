@@ -179,7 +179,7 @@ class Shifts extends React.Component {
               this.calculateTimeAndPay(tempShift[i]);
             }
             this.setState({
-              shifts: tempShift,
+              shifts: tempShift.reverse(),
             });
           } else {
             console.log(response.error);
