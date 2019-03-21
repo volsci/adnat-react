@@ -11,9 +11,8 @@ import Grid from '@material-ui/core/Grid/Grid';
 import Switch from '@material-ui/core/Switch/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel/FormControlLabel';
 import FormGroup from '@material-ui/core/FormGroup/FormGroup';
-import CloseIcon from '@material-ui/icons/Close';
-import Snackbar from '@material-ui/core/Snackbar/Snackbar';
-import IconButton from '@material-ui/core/IconButton/IconButton';
+import PopUp from './PopUp';
+import adnat from '../../public/adnat.png';
 
 const styles = theme => ({
   root: {
@@ -47,6 +46,10 @@ const styles = theme => ({
     marginLeft: 'auto',
     width: '100%',
   },
+  adnat: {
+    marginTop: theme.spacing.unit * 2,
+    textAlign: 'center',
+  },
 });
 
 /**
@@ -68,7 +71,7 @@ class LogIn extends React.Component {
     authenticated: false,
   };
 
-  componentWillMount() {
+  componentDidMount() {
     const { cookies } = this.props;
 
     if (JSON.stringify(cookies.get('sessionId')) === undefined) {
@@ -151,11 +154,7 @@ class LogIn extends React.Component {
   handleLogin = (event) => {
     event.preventDefault();
 
-    if (this.state.email === '' || this.state.password === '') {
-      this.handleSnackBarOpen('Please enter your email address and password');
-    } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen('Please provide a valid email address');
-    } else {
+    if (this.validateLogIn(this.state.email, this.state.password) === true) {
       (async () => {
         await fetch('http://localhost:3000/auth/login', {
           headers: {
@@ -190,6 +189,20 @@ class LogIn extends React.Component {
       toSignUp: true,
     });
   };
+
+  /**
+   * Check if the fields are empty, and check if the email is valid.
+   */
+  validateLogIn(email, password) {
+    if (email === '' || password === '') {
+      this.handleSnackBarOpen('Please enter your email address and password');
+      return false;
+    } if (!email.includes('@')) {
+      this.handleSnackBarOpen('Please provide a valid email address');
+      return false;
+    }
+    return true;
+  }
 
   render() {
     const { classes } = this.props;
@@ -226,115 +239,101 @@ class LogIn extends React.Component {
     }
 
     return (
-      <Grid container className={classes.root}>
-        <Grid item xs={12}>
-          <Grid
-            container
-            spacing={8}
-            className={classes.demo}
-            alignItems="center"
-            justify="center"
-          >
-            <Grid item>
-              <Card className={classes.card}>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-email-input"
-                    label="Email"
-                    type="email"
-                    name="email"
-                    autoComplete="email"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.email}
-                    onChange={this.handleEmailInput}
-                  />
-                </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-password-input"
-                    label="Password"
-                    type="password"
-                    autoComplete="current-password"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.password}
-                    onChange={this.handlePasswordInput}
-                  />
-                </CardActions>
-                <CardActions>
-                  <Grid container spacing={24}>
-                    <Grid item xs={6}>
-                      <FormGroup row>
-                        <FormControlLabel
-                          className={classes.accountHandlers}
-                          control={(
-                            <Switch
-                              checked={this.state.rememberMe}
-                              onChange={this.handleChange('rememberMe')}
-                              value="rememberMe"
-                            />
+      <div className={classes.adnat}>
+        <img src={adnat} alt="" />
+        <Grid container className={classes.root}>
+          <Grid item xs={12}>
+            <Grid
+              container
+              spacing={8}
+              className={classes.demo}
+              alignItems="center"
+              justify="center"
+              direction="column"
+            >
+              <Grid item>
+                <Card className={classes.card}>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-email-input"
+                      label="Email"
+                      type="email"
+                      name="email"
+                      autoComplete="email"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.email}
+                      onChange={this.handleEmailInput}
+                    />
+                  </CardActions>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-password-input"
+                      label="Password"
+                      type="password"
+                      autoComplete="current-password"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.password}
+                      onChange={this.handlePasswordInput}
+                    />
+                  </CardActions>
+                  <CardActions>
+                    <Grid container spacing={24}>
+                      <Grid item xs={6}>
+                        <FormGroup row>
+                          <FormControlLabel
+                            className={classes.accountHandlers}
+                            control={(
+                              <Switch
+                                checked={this.state.rememberMe}
+                                onChange={this.handleChange('rememberMe')}
+                                value="rememberMe"
+                              />
                           )}
-                          label="Remember Me"
-                        />
-                      </FormGroup>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Button
-                        className={classes.accountHandlers}
-                        onClick={this.handleForgotPassword}
-                      >
+                            label="Remember Me"
+                          />
+                        </FormGroup>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button
+                          className={classes.accountHandlers}
+                          onClick={this.handleForgotPassword}
+                        >
                         Forgot Password
-                      </Button>
+                        </Button>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </CardActions>
-                <CardActions disableActionSpacing>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    className={classes.forgotPassword}
-                    onClick={this.handleLogin}
-                  >
+                  </CardActions>
+                  <CardActions disableActionSpacing>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      className={classes.forgotPassword}
+                      onClick={this.handleLogin}
+                    >
                     Log In
-                  </Button>
+                    </Button>
 
-                </CardActions>
-              </Card>
-              <Button className={classes.signUp} onClick={this.handleSignUp}>
-                {"Don't have an account yet? Sign Up"}
-              </Button>
+                  </CardActions>
+                </Card>
+                <Button className={classes.signUp} onClick={this.handleSignUp}>
+                  {"Don't have an account yet? Sign Up"}
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
 
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={this.state.error}
-          autoHideDuration={3000}
-          onClose={this.handleSnackBarClose}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id">{this.state.errorMsg}</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              className={classes.close}
-              onClick={this.handleSnackBarClose}
-            >
-              <CloseIcon />
-            </IconButton>,
-          ]}
-        />
-      </Grid>
+          <PopUp
+            error={this.state.error}
+            errorMsg={this.state.errorMsg}
+            handleSnackBarClose={this.handleSnackBarClose.bind(this)}
+          />
+
+        </Grid>
+      </div>
     );
   }
 }

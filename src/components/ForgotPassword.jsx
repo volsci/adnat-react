@@ -8,9 +8,8 @@ import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField/TextField';
 import Grid from '@material-ui/core/Grid/Grid';
-import CloseIcon from '@material-ui/icons/Close';
-import Snackbar from '@material-ui/core/Snackbar/Snackbar';
-import IconButton from '@material-ui/core/IconButton/IconButton';
+import PopUp from './PopUp';
+import adnat from '../../public/adnat.png';
 
 const styles = theme => ({
   root: {
@@ -41,6 +40,10 @@ const styles = theme => ({
     marginLeft: 'auto',
     width: '100%',
   },
+  adnat: {
+    marginTop: theme.spacing.unit * 2,
+    textAlign: 'center',
+  },
 });
 
 /**
@@ -57,7 +60,7 @@ class ForgotPassword extends React.Component {
 
   };
 
-  componentWillMount() {
+  componentDidMount() {
     const { cookies } = this.props;
 
     if (JSON.stringify(cookies.get('sessionId')) === undefined) {
@@ -100,11 +103,7 @@ class ForgotPassword extends React.Component {
   handleEmailPassword = (event) => {
     event.preventDefault();
 
-    if (this.state.email === '') {
-      this.handleSnackBarOpen('Please enter your email address');
-    } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen('Please provide a valid email address');
-    } else {
+    if (this.validateForgotPassword(this.state.email) === true) {
       this.setState({
         email: '',
       });
@@ -119,6 +118,20 @@ class ForgotPassword extends React.Component {
       toLogIn: true,
     });
   };
+
+  /**
+   * Check if the field is empty, and check if the email is valid.
+   */
+  validateForgotPassword(email) {
+    if (email === '') {
+      this.handleSnackBarOpen('Please enter your email address');
+      return false;
+    } if (!email.includes('@')) {
+      this.handleSnackBarOpen('Please provide a valid email address');
+      return false;
+    }
+    return true;
+  }
 
   render() {
     const { classes } = this.props;
@@ -139,70 +152,56 @@ class ForgotPassword extends React.Component {
     }
 
     return (
-      <Grid container className={classes.root}>
-        <Grid item xs={12}>
-          <Grid
-            container
-            spacing={8}
-            className={classes.demo}
-            alignItems="center"
-            justify="center"
-          >
-            <Grid item>
-              <Card className={classes.card}>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-email-input"
-                    label="Email"
-                    type="email"
-                    name="email"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.email}
-                    onChange={this.handleEmailInput}
-                  />
-                </CardActions>
-                <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleEmailPassword}>
+      <div className={classes.adnat}>
+        <img src={adnat} alt="" />
+        <Grid container className={classes.root}>
+          <Grid item xs={12}>
+            <Grid
+              container
+              spacing={8}
+              className={classes.demo}
+              alignItems="center"
+              justify="center"
+              direction="column"
+            >
+              <Grid item>
+                <Card className={classes.card}>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-email-input"
+                      label="Email"
+                      type="email"
+                      name="email"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.email}
+                      onChange={this.handleEmailInput}
+                    />
+                  </CardActions>
+                  <CardActions disableActionSpacing>
+                    <Button variant="contained" color="secondary" className={classes.forgotPassword} onClick={this.handleEmailPassword}>
                     Send Me A Reset Password Link
-                  </Button>
-                </CardActions>
-                <CardActions disableActionSpacing>
-                  <Button variant="contained" className={classes.forgotPassword} onClick={this.handleBack}>
+                    </Button>
+                  </CardActions>
+                  <CardActions disableActionSpacing>
+                    <Button variant="contained" className={classes.forgotPassword} onClick={this.handleBack}>
                     Back
-                  </Button>
-                </CardActions>
-              </Card>
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
 
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={this.state.error}
-          autoHideDuration={3000}
-          onClose={this.handleSnackBarClose}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id">{this.state.errorMsg}</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              className={classes.close}
-              onClick={this.handleSnackBarClose}
-            >
-              <CloseIcon />
-            </IconButton>,
-          ]}
-        />
-      </Grid>
+          <PopUp
+            error={this.state.error}
+            errorMsg={this.state.errorMsg}
+            handleSnackBarClose={this.handleSnackBarClose.bind(this)}
+          />
+
+        </Grid>
+      </div>
     );
   }
 }

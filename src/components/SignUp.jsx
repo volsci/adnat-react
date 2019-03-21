@@ -7,10 +7,9 @@ import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField/TextField';
 import Grid from '@material-ui/core/Grid/Grid';
-import CloseIcon from '@material-ui/icons/Close';
-import Snackbar from '@material-ui/core/Snackbar/Snackbar';
-import IconButton from '@material-ui/core/IconButton/IconButton';
 import withStyles from '@material-ui/core/es/styles/withStyles';
+import PopUp from './PopUp';
+import adnat from '../../public/adnat.png';
 
 const styles = theme => ({
   root: {
@@ -41,6 +40,10 @@ const styles = theme => ({
     marginLeft: 'auto',
     width: '100%',
   },
+  adnat: {
+    marginTop: theme.spacing.unit * 2,
+    textAlign: 'center',
+  },
 });
 
 /**
@@ -59,7 +62,7 @@ class SignUp extends React.Component {
     authenticated: false,
   };
 
-  componentWillMount() {
+  componentDidMount() {
     const { cookies } = this.props;
 
     if (JSON.stringify(cookies.get('sessionId')) === undefined) {
@@ -128,16 +131,10 @@ class SignUp extends React.Component {
   handleSignUp = (event) => {
     event.preventDefault();
 
-    if (this.state.name === ''
-      || this.state.email === ''
-      || this.state.password === ''
-      || this.state.passwordConfirmation === '') {
-      this.handleSnackBarOpen('Please provide all of the required details');
-    } else if (!this.state.email.includes('@')) {
-      this.handleSnackBarOpen('Please provide a valid email address');
-    } else if (this.state.password.length < 6) {
-      this.handleSnackBarOpen('Please enter a password with six characters or more');
-    } else {
+    if (this.validateSignUp(this.state.name,
+      this.state.email,
+      this.state.password,
+      this.state.passwordConfirmation) === true) {
       (async () => {
         await fetch('http://localhost:3000/auth/signUp', {
           headers: {
@@ -154,9 +151,7 @@ class SignUp extends React.Component {
         }).then(res => res.json())
           .then((response) => {
             if (response.error === undefined) {
-              this.handleSnackBarOpen('Success! Account created, please log in with your provided details');
               this.saveCookie(response.sessionId);
-
               this.setState({
                 authenticated: true,
               });
@@ -177,6 +172,27 @@ class SignUp extends React.Component {
     });
   };
 
+  /**
+   * Check that all the sign up fields have been supplied, that the email is valid,
+   * and that the password is six characters or more.
+   */
+  validateSignUp(name, email, password, passwordConfirmation) {
+    if (name === ''
+      || email === ''
+      || password === ''
+      || passwordConfirmation === '') {
+      this.handleSnackBarOpen('Please provide all of the required details');
+      return false;
+    } if (!email.includes('@')) {
+      this.handleSnackBarOpen('Please provide a valid email address');
+      return false;
+    } if (password.length < 6) {
+      this.handleSnackBarOpen('Please enter a password with six characters or more');
+      return false;
+    }
+    return true;
+  }
+
   render() {
     const { classes } = this.props;
 
@@ -196,109 +212,93 @@ class SignUp extends React.Component {
     }
 
     return (
-      <Grid container className={classes.root}>
-        <Grid item xs={12}>
-          <Grid
-            container
-            spacing={8}
-            className={classes.demo}
-            alignItems="center"
-            justify="center"
-          >
-            <Grid item>
-              <Card className={classes.card}>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-name"
-                    label="Name"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.name}
-                    onChange={this.handleNameInput}
-                    fullWidth
-                  />
-                </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-email-input"
-                    label="Email"
-                    type="email"
-                    name="email"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.email}
-                    onChange={this.handleEmailInput}
-                    fullWidth
-                  />
-                </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-password-input"
-                    label="Password"
-                    type="password"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.password}
-                    onChange={this.handlePasswordInput}
-                    fullWidth
-                  />
-                </CardActions>
-                <CardActions>
-                  <TextField
-                    className={classes.input}
-                    id="outlined-passwordConfirmation-input"
-                    label="Confirm Password"
-                    type="password"
-                    margin="normal"
-                    variant="outlined"
-                    value={this.state.passwordConfirmation}
-                    onChange={this.handlePasswordConfirmationInput}
-                    fullWidth
-                  />
-                </CardActions>
-                <CardActions disableActionSpacing>
-                  <Button variant="contained" color="secondary" className={classes.forgotPassword} fullWidth onClick={this.handleSignUp}>
+      <div className={classes.adnat}>
+        <img src={adnat} alt="" />
+        <Grid container className={classes.root}>
+          <Grid item xs={12}>
+            <Grid
+              container
+              spacing={8}
+              className={classes.demo}
+              alignItems="center"
+              justify="center"
+              direction="column"
+            >
+              <Grid item>
+                <Card className={classes.card}>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-name"
+                      label="Name"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.name}
+                      onChange={this.handleNameInput}
+                      fullWidth
+                    />
+                  </CardActions>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-email-input"
+                      label="Email"
+                      type="email"
+                      name="email"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.email}
+                      onChange={this.handleEmailInput}
+                      fullWidth
+                    />
+                  </CardActions>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-password-input"
+                      label="Password"
+                      type="password"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.password}
+                      onChange={this.handlePasswordInput}
+                      fullWidth
+                    />
+                  </CardActions>
+                  <CardActions>
+                    <TextField
+                      className={classes.input}
+                      id="outlined-passwordConfirmation-input"
+                      label="Confirm Password"
+                      type="password"
+                      margin="normal"
+                      variant="outlined"
+                      value={this.state.passwordConfirmation}
+                      onChange={this.handlePasswordConfirmationInput}
+                      fullWidth
+                    />
+                  </CardActions>
+                  <CardActions disableActionSpacing>
+                    <Button variant="contained" color="secondary" className={classes.forgotPassword} fullWidth onClick={this.handleSignUp}>
                     Sign Up
-                  </Button>
-                </CardActions>
-                <CardActions disableActionSpacing>
-                  <Button variant="contained" className={classes.forgotPassword} fullWidth onClick={this.handleBack}>
+                    </Button>
+                  </CardActions>
+                  <CardActions disableActionSpacing>
+                    <Button variant="contained" className={classes.forgotPassword} fullWidth onClick={this.handleBack}>
                     Back
-                  </Button>
-                </CardActions>
-              </Card>
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Grid>
             </Grid>
           </Grid>
+          <PopUp
+            error={this.state.error}
+            errorMsg={this.state.errorMsg}
+            handleSnackBarClose={this.handleSnackBarClose.bind(this)}
+          />
         </Grid>
-
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={this.state.error}
-          autoHideDuration={3000}
-          onClose={this.handleSnackBarClose}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id">{this.state.errorMsg}</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              className={classes.close}
-              onClick={this.handleSnackBarClose}
-            >
-              <CloseIcon />
-            </IconButton>,
-          ]}
-        />
-      </Grid>
+      </div>
     );
   }
 }
